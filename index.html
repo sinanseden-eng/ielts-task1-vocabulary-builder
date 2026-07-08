@@ -9,22 +9,59 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&family=Lora:wght@500;700;italic&display=swap" rel="stylesheet">
     <style>
         body {
-            background-color: #f8fafc;
             font-family: 'Inter', sans-serif;
             color: #1e293b;
             scroll-behavior: smooth;
         }
         .font-lora { font-family: 'Lora', serif; }
 
-        /* Card Flip Styles for Quizlet & Memory Effect */
+        /* App Global Background */
+        .app-bg {
+            background-image: url('https://images.pexels.com/photos/1190297/pexels-photo-1190297.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            min-height: 100vh;
+        }
+
+        /* LIQUID GLASS / MAC OS STYLE CARDS */
+        .liquid-card {
+            background: linear-gradient(180deg, rgba(230, 245, 255, 0.85) 0%, rgba(200, 230, 255, 0.6) 45%, rgba(150, 210, 255, 0.85) 100%);
+            box-shadow: 0 12px 30px rgba(0, 70, 150, 0.2), inset 0 4px 10px rgba(255, 255, 255, 0.95), inset 0 -8px 16px rgba(50, 150, 255, 0.5), inset 0 0 5px rgba(255,255,255,0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.7);
+            border-radius: 2rem;
+            position: relative;
+            overflow: hidden;
+            padding: 2rem;
+        }
+        
+        .liquid-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 5%;
+            width: 90%;
+            height: 45%;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.05) 100%);
+            border-radius: 0 0 100px 100px;
+            pointer-events: none;
+            box-shadow: inset 0 2px 3px rgba(255,255,255,1);
+            z-index: 0;
+        }
+
+        .content-z { position: relative; z-index: 10; }
+
+        /* Card Flip Styles */
         .perspective-1000 { perspective: 1000px; }
         .transform-style-3d { transform-style: preserve-3d; }
         .backface-hidden { backface-visibility: hidden; -webkit-backface-visibility: hidden; }
         .rotate-y-180 { transform: rotateY(180deg); }
 
         /* Input highlight states */
-        .input-correct { background-color: #dcfce7; border-color: #10b981; color: #065f46; }
-        .input-incorrect { background-color: #fee2e2; border-color: #ef4444; color: #991b1b; }
+        .input-correct { background-color: #dcfce7 !important; border-color: #10b981 !important; color: #065f46 !important; }
+        .input-incorrect { background-color: #fee2e2 !important; border-color: #ef4444 !important; color: #991b1b !important; }
         
         .fade-in { animation: fadeIn 0.4s ease-out forwards; }
         @keyframes fadeIn {
@@ -33,8 +70,8 @@
         }
 
         /* Interactive Element States */
-        .btn-selectable { transition: all 0.2s ease; border: 2px solid #e2e8f0; cursor: pointer; }
-        .btn-selectable:hover { border-color: #cbd5e1; background-color: #f8fafc; transform: translateY(-1px); }
+        .btn-selectable { transition: all 0.2s ease; border: 2px solid rgba(255,255,255,0.5); cursor: pointer; }
+        .btn-selectable:hover { border-color: #cbd5e1; background-color: rgba(255,255,255,0.8); transform: translateY(-1px); }
         .btn-selected { border-color: #6366f1 !important; background-color: #e0e7ff !important; color: #3730a3 !important; font-weight: bold; }
         .btn-correct { border-color: #10b981 !important; background-color: #dcfce7 !important; color: #065f46 !important; opacity: 0.8; pointer-events: none; }
         .btn-wrong { border-color: #ef4444 !important; background-color: #fee2e2 !important; color: #991b1b !important; animation: shake 0.4s; }
@@ -51,268 +88,387 @@
         .memory-card-inner { width: 100%; height: 100%; transition: transform 0.6s; transform-style: preserve-3d; position: relative; }
         .memory-card.flipped .memory-card-inner { transform: rotateY(180deg); }
         .memory-card-front, .memory-card-back { width: 100%; height: 100%; position: absolute; backface-visibility: hidden; border-radius: 12px; display: flex; align-items: center; justify-content: center; padding: 8px; text-align: center; font-weight: bold; }
-        .memory-card-front { background: #4f46e5; color: white; border: 2px solid #3730a3; font-size: 2rem; }
+        .memory-card-front { background: rgba(255,255,255,0.5); backdrop-filter: blur(5px); color: #3730a3; border: 2px solid rgba(255,255,255,0.8); font-size: 2rem; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
         .memory-card-back { background: white; color: #1e293b; border: 2px solid #e2e8f0; transform: rotateY(180deg); font-size: 0.9rem; }
         .memory-card.matched .memory-card-back { background: #dcfce7; border-color: #10b981; color: #065f46; }
 
         .sm-word { cursor: pointer; transition: transform 0.1s; }
         .sm-word:active { transform: scale(0.95); }
-        
         .gap-fill-blank { display: inline-block; min-width: 80px; height: 28px; border-bottom: 2px solid #94a3b8; margin: 0 4px; text-align: center; font-weight: bold; color: #4f46e5; cursor: pointer; vertical-align: bottom;}
         .gap-fill-blank.filled { border-bottom-color: #4f46e5; }
+        
+        /* Millionaire Styles */
+        .mil-btn { background: linear-gradient(180deg, #1e3a8a 0%, #172554 100%); border: 2px solid #fbbf24; color: white; transition: all 0.2s; position: relative; }
+        .mil-btn:hover { background: linear-gradient(180deg, #2563eb 0%, #1e3a8a 100%); border-color: #fcd34d; }
+        .mil-btn.correct { background: linear-gradient(180deg, #059669 0%, #047857 100%) !important; border-color: #34d399 !important; animation: pulse-green 1s; }
+        .mil-btn.wrong { background: linear-gradient(180deg, #dc2626 0%, #b91c1c 100%) !important; border-color: #f87171 !important; }
+        .ladder-step.active { color: #fbbf24; font-weight: 800; background: rgba(251, 191, 36, 0.2); border-radius: 4px; }
+        .ladder-step.safe { color: #f8fafc; }
+        @keyframes pulse-green { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
     </style>
 </head>
-<body class="pb-20">
+<body class="app-bg pb-20">
 
     <!-- Premium Header -->
-    <div class="bg-indigo-900 text-white pt-16 pb-12 px-4 shadow-lg text-center relative overflow-hidden">
+    <div class="bg-indigo-900/90 backdrop-blur-md text-white pt-16 pb-12 px-4 shadow-2xl text-center relative overflow-hidden border-b border-indigo-500/30">
         <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(#fff 1px, transparent 1px); background-size: 20px 20px;"></div>
-        <h1 class="text-4xl md:text-5xl font-lora font-bold mb-4 relative z-10">IELTS Task 1 Vocabulary Builder</h1>
-        <p class="text-lg text-indigo-200 max-w-2xl mx-auto font-medium relative z-10">Master the essential academic trends, collocations, and word families required for a Band 7+ score, completely adapted from Cambridge standards.</p>
+        <h1 class="text-4xl md:text-5xl lg:text-6xl font-lora font-bold mb-4 relative z-10 drop-shadow-md">IELTS Task 1 Vocabulary Builder</h1>
+        <p class="text-lg md:text-xl text-indigo-100 max-w-2xl mx-auto font-medium relative z-10">Master the essential academic trends, collocations, and word families required for a Band 7+ score.</p>
         
         <!-- Jump Menu -->
         <div class="mt-8 flex flex-wrap justify-center gap-3 relative z-10">
-            <a href="#flashcards" class="bg-white/10 hover:bg-white/20 px-4 py-2 rounded-full text-sm font-semibold transition">Flashcards</a>
-            <a href="#rewrites" class="bg-white/10 hover:bg-white/20 px-4 py-2 rounded-full text-sm font-semibold transition">Rewrites</a>
-            <a href="#collocations" class="bg-white/10 hover:bg-white/20 px-4 py-2 rounded-full text-sm font-semibold transition">Collocations</a>
-            <a href="#wordwebs" class="bg-white/10 hover:bg-white/20 px-4 py-2 rounded-full text-sm font-semibold transition">Word Webs</a>
-            <a href="#games" class="bg-indigo-500 hover:bg-indigo-400 px-4 py-2 rounded-full text-sm font-bold transition shadow-md">Play Games</a>
+            <a href="#flashcards" class="bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/40 px-5 py-2.5 rounded-full text-sm font-semibold transition shadow-sm">Flashcards</a>
+            <a href="#rewrites" class="bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/40 px-5 py-2.5 rounded-full text-sm font-semibold transition shadow-sm">Rewrites</a>
+            <a href="#collocations" class="bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/40 px-5 py-2.5 rounded-full text-sm font-semibold transition shadow-sm">Collocations</a>
+            <a href="#wordwebs" class="bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/40 px-5 py-2.5 rounded-full text-sm font-semibold transition shadow-sm">Word Webs</a>
+            <a href="#games" class="bg-indigo-500 hover:bg-indigo-400 border border-indigo-300 px-6 py-2.5 rounded-full text-sm font-bold transition shadow-lg text-white">Play Games</a>
         </div>
     </div>
 
     <div class="max-w-6xl mx-auto px-4 mt-12 space-y-16">
 
         <!-- ACTIVITY 1: QUIZLET-STYLE FLASHCARDS -->
-        <section id="flashcards" class="bg-white rounded-[2rem] p-8 shadow-xl border border-slate-100">
-            <div class="mb-8 flex flex-col md:flex-row justify-between items-start md:items-center">
-                <div>
-                    <h2 class="text-2xl font-bold text-slate-800 flex items-center">
-                        <svg class="w-6 h-6 mr-3 text-sky-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
-                        Comprehensive Trends Memory Bank
-                    </h2>
-                    <p class="text-slate-500 mt-1">Includes all definitive verbs, nouns, adverbs, and adjectives for describing data. Click to flip.</p>
-                </div>
-                <div class="bg-slate-100 text-slate-600 font-bold px-4 py-2 rounded-lg mt-4 md:mt-0 shadow-sm border border-slate-200">
-                    Card <span id="card-current">1</span> of <span id="card-total">0</span>
-                </div>
-            </div>
-
-            <div class="flex flex-col items-center">
-                <div id="flashcard-container" class="relative w-full max-w-3xl h-80 cursor-pointer perspective-1000 mb-8" onclick="toggleFlashcard()">
-                    <div id="flashcard-inner" class="w-full h-full relative transition-transform duration-500 transform-style-3d">
-                        <div class="absolute w-full h-full rounded-3xl p-8 flex flex-col items-center justify-center bg-white border-2 border-sky-100 shadow-lg backface-hidden">
-                            <div id="fc-type" class="absolute top-6 right-6 text-xs font-bold text-sky-600 bg-sky-50 px-3 py-1 rounded-full uppercase tracking-wide">Type</div>
-                            <h3 id="fc-word" class="text-5xl md:text-6xl font-black text-slate-800 mb-4 drop-shadow-sm font-lora text-center">Word</h3>
-                            <div class="absolute bottom-6 text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center">
-                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-                                Click to Flip
-                            </div>
-                        </div>
-                        <div class="absolute w-full h-full rounded-3xl p-8 flex flex-col items-center justify-center bg-slate-800 border-2 border-slate-700 shadow-xl backface-hidden rotate-y-180 text-center">
-                            <p id="fc-def" class="text-white font-medium text-xl md:text-2xl mb-4 leading-relaxed">"Definition"</p>
-                            <div class="bg-slate-700/50 px-6 py-4 rounded-xl border border-slate-600 w-full max-w-lg mt-4">
-                                <p class="text-xs text-slate-400 uppercase tracking-wider mb-2">Usage / Collocation:</p>
-                                <p id="fc-cols" class="text-lg font-bold text-sky-300">Usage</p>
-                            </div>
-                        </div>
+        <section id="flashcards" class="liquid-card">
+            <div class="content-z">
+                <div class="mb-8 flex flex-col md:flex-row justify-between items-start md:items-center">
+                    <div>
+                        <h2 class="text-3xl font-bold text-slate-800 flex items-center drop-shadow-sm">
+                            <svg class="w-8 h-8 mr-3 text-sky-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                            Core Trends Memory Bank
+                        </h2>
+                        <p class="text-slate-600 mt-2 font-medium">Includes all definitive verbs, nouns, adverbs, and adjectives for describing data. Click to flip.</p>
+                    </div>
+                    <div class="bg-white/60 backdrop-blur-sm text-slate-700 font-bold px-5 py-2.5 rounded-xl mt-4 md:mt-0 shadow-sm border border-white">
+                        Card <span id="card-current">1</span> of <span id="card-total">0</span>
                     </div>
                 </div>
 
-                <div class="flex gap-4">
-                    <button onclick="prevCard()" class="bg-white hover:bg-slate-50 text-slate-700 border-2 border-slate-200 p-4 rounded-full shadow-sm transition-transform hover:-translate-x-1">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
-                    </button>
-                    <button onclick="nextCard()" class="bg-white hover:bg-slate-50 text-slate-700 border-2 border-slate-200 p-4 rounded-full shadow-sm transition-transform hover:translate-x-1">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                    </button>
+                <div class="flex flex-col items-center">
+                    <div id="flashcard-container" class="relative w-full max-w-3xl h-80 cursor-pointer perspective-1000 mb-8" onclick="toggleFlashcard()">
+                        <div id="flashcard-inner" class="w-full h-full relative transition-transform duration-500 transform-style-3d">
+                            <div class="absolute w-full h-full rounded-[2rem] p-8 flex flex-col items-center justify-center bg-white/80 backdrop-blur-md border border-white shadow-lg backface-hidden">
+                                <div id="fc-type" class="absolute top-6 right-6 text-xs font-bold text-sky-700 bg-sky-100/80 px-3 py-1 rounded-lg uppercase tracking-wide border border-sky-200">Type</div>
+                                <h3 id="fc-word" class="text-5xl md:text-6xl font-black text-slate-800 mb-4 drop-shadow-sm font-lora text-center">Word</h3>
+                                <div class="absolute bottom-6 text-xs font-bold text-slate-500 uppercase tracking-widest flex items-center">
+                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                                    Click to Flip
+                                </div>
+                            </div>
+                            <div class="absolute w-full h-full rounded-[2rem] p-8 flex flex-col items-center justify-center bg-slate-800/95 backdrop-blur-md border border-slate-600 shadow-xl backface-hidden rotate-y-180 text-center">
+                                <p id="fc-def" class="text-white font-medium text-xl md:text-2xl mb-4 leading-relaxed">"Definition"</p>
+                                <div class="bg-slate-900/60 px-6 py-4 rounded-xl border border-slate-700 w-full max-w-lg mt-4">
+                                    <p class="text-xs text-slate-400 uppercase tracking-wider mb-2">Usage / Collocation:</p>
+                                    <p id="fc-cols" class="text-lg font-bold text-sky-300">Usage</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-4">
+                        <button onclick="prevCard()" class="bg-white/80 backdrop-blur-sm hover:bg-white text-slate-700 border border-white p-4 rounded-full shadow-md transition-all hover:-translate-x-1">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                        </button>
+                        <button onclick="nextCard()" class="bg-white/80 backdrop-blur-sm hover:bg-white text-slate-700 border border-white p-4 rounded-full shadow-md transition-all hover:translate-x-1">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                        </button>
+                    </div>
                 </div>
             </div>
         </section>
 
         <!-- ACTIVITY 2: REWRITE CHALLENGE -->
-        <section id="rewrites" class="bg-white rounded-[2rem] p-8 shadow-xl border border-slate-100">
-            <h2 class="text-2xl font-bold text-slate-800 mb-2 flex items-center">
-                <svg class="w-6 h-6 mr-3 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
-                Rewrite Challenge: Verb/Adverb ↔ Adjective/Noun
-            </h2>
-            <p class="text-slate-600 mb-8">A key to a Band 7+ is grammatical flexibility. Convert the <strong>verb + adverb</strong> structure in the original sentence into an <strong>adjective + noun</strong> structure.</p>
-            
-            <div id="rewrite-container" class="space-y-6">
-                <!-- Dynamically generated by JS -->
-            </div>
-            
-            <div class="mt-8 flex justify-center">
-                <button onclick="checkRewrites()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-10 rounded-xl shadow-lg transition-colors border border-emerald-500">
-                    Check Answers
-                </button>
+        <section id="rewrites" class="liquid-card">
+            <div class="content-z">
+                <h2 class="text-3xl font-bold text-slate-800 mb-2 flex items-center drop-shadow-sm">
+                    <svg class="w-8 h-8 mr-3 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
+                    Rewrite Challenge: Verb/Adverb ↔ Adjective/Noun
+                </h2>
+                <p class="text-slate-700 mb-8 font-medium">A key to a Band 7+ is grammatical flexibility. Convert the <strong>verb + adverb</strong> structure in the original sentence into an <strong>adjective + noun</strong> structure.</p>
+                
+                <div id="rewrite-container" class="space-y-6">
+                    <!-- Dynamically generated by JS -->
+                </div>
+                
+                <div class="mt-8 flex justify-center">
+                    <button onclick="checkRewrites()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3.5 px-12 rounded-xl shadow-lg transition-colors border border-emerald-400">
+                        Check Answers
+                    </button>
+                </div>
             </div>
         </section>
 
         <!-- ACTIVITY 3: VISUAL TREND GUESSER -->
-        <section class="bg-white rounded-[2rem] p-8 shadow-xl border border-slate-100">
-            <h2 class="text-2xl font-bold text-slate-800 mb-2 flex items-center">
-                <svg class="w-6 h-6 mr-3 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                Visual Trend Guesser
-            </h2>
-            <p class="text-slate-600 mb-8">Analyze the shape of the data and select the most accurate, academic phrasing.</p>
-            
-            <div class="grid md:grid-cols-3 gap-8" id="guesser-container">
-                <!-- Dynamically generated by JS -->
+        <section class="liquid-card">
+            <div class="content-z">
+                <h2 class="text-3xl font-bold text-slate-800 mb-2 flex items-center drop-shadow-sm">
+                    <svg class="w-8 h-8 mr-3 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    Visual Trend Guesser
+                </h2>
+                <p class="text-slate-700 mb-8 font-medium">Analyze the shape of the data and select the most accurate, academic phrasing.</p>
+                
+                <div class="grid md:grid-cols-3 gap-8" id="guesser-container">
+                    <!-- Dynamically generated by JS -->
+                </div>
             </div>
         </section>
 
-        <!-- ACTIVITY 4: SEMANTIC WORD WEBS (Interactive) -->
-        <section id="wordwebs" class="bg-white rounded-[2rem] p-8 shadow-xl border border-slate-100">
-            <div class="mb-8">
-                <h2 class="text-2xl font-bold text-slate-800 flex items-center mb-2">
-                    <svg class="w-6 h-6 mr-3 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>
-                    Semantic Word Webs
-                </h2>
-                <p class="text-slate-600">Select the <strong>four</strong> words from the bank that belong to the target semantic category.</p>
-            </div>
+        <!-- ACTIVITY 4: SEMANTIC WORD WEBS -->
+        <section id="wordwebs" class="liquid-card">
+            <div class="content-z">
+                <div class="mb-8">
+                    <h2 class="text-3xl font-bold text-slate-800 flex items-center mb-2 drop-shadow-sm">
+                        <svg class="w-8 h-8 mr-3 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>
+                        Semantic Word Webs
+                    </h2>
+                    <p class="text-slate-700 font-medium">Select the <strong>four</strong> words from the bank that belong to the target semantic category.</p>
+                </div>
 
-            <div id="wordwebs-container" class="space-y-10">
-                <!-- Dynamically generated by JS -->
+                <div id="wordwebs-container" class="space-y-10">
+                    <!-- Dynamically generated by JS -->
+                </div>
             </div>
         </section>
 
         <!-- ACTIVITY 5: MULTIPLE COLLOCATION MATCHERS -->
-        <section id="collocations" class="bg-white rounded-[2rem] p-8 shadow-xl border border-slate-100">
-            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
-                <div>
-                    <h2 class="text-2xl font-bold text-slate-800 mb-2 flex items-center">
-                        <svg class="w-6 h-6 mr-3 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5M12 21l-2-1m2 1l2-1m-2 1v-2.5M6 18l-2-1v-2.5M18 18l2-1v-2.5"></path></svg>
-                        Collocation Matchers
-                    </h2>
-                    <p class="text-slate-600">Click a word/phrase on the left, then click its natural partner on the right.</p>
+        <section id="collocations" class="liquid-card">
+            <div class="content-z">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+                    <div>
+                        <h2 class="text-3xl font-bold text-slate-800 mb-2 flex items-center drop-shadow-sm">
+                            <svg class="w-8 h-8 mr-3 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5M12 21l-2-1m2 1l2-1m-2 1v-2.5M6 18l-2-1v-2.5M18 18l2-1v-2.5"></path></svg>
+                            Collocation Matchers
+                        </h2>
+                        <p class="text-slate-700 font-medium">Click a word/phrase on the left, then click its natural partner on the right.</p>
+                    </div>
                 </div>
-            </div>
 
-            <!-- Set Navigation -->
-            <div class="flex flex-wrap gap-2 mb-8" id="colloc-set-nav">
-                <!-- Buttons injected via JS -->
+                <div class="flex flex-wrap gap-3 mb-8" id="colloc-set-nav"></div>
+                
+                <div class="flex flex-col md:flex-row gap-6 max-w-4xl mx-auto bg-white/50 backdrop-blur-md p-8 rounded-2xl border border-white/60 shadow-inner">
+                    <div class="flex-1 flex flex-col gap-4" id="colloc-left"></div>
+                    <div class="flex-1 flex flex-col gap-4" id="colloc-right"></div>
+                </div>
+                <div id="colloc-feedback" class="mt-6 text-center font-bold text-lg hidden"></div>
             </div>
-            
-            <div class="flex flex-col md:flex-row gap-6 max-w-4xl mx-auto bg-slate-50 p-8 rounded-2xl border border-slate-200">
-                <div class="flex-1 flex flex-col gap-4" id="colloc-left"></div>
-                <div class="flex-1 flex flex-col gap-4" id="colloc-right"></div>
-            </div>
-            <div id="colloc-feedback" class="mt-6 text-center font-bold text-lg hidden"></div>
         </section>
 
         <!-- ACTIVITY 6: THE ODD ONE OUT -->
-        <section id="oddoneout" class="bg-white rounded-[2rem] p-8 shadow-xl border border-slate-100">
-            <h2 class="text-2xl font-bold text-slate-800 mb-2 flex items-center">
-                <svg class="w-6 h-6 mr-3 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
-                The Odd One Out
-            </h2>
-            <p class="text-slate-600 mb-8">Three words in each group are strongly related. Click the <strong>one word that does NOT belong</strong>.</p>
-            
-            <div id="odd-container" class="space-y-6">
-                <!-- Dynamically generated by JS -->
+        <section id="oddoneout" class="liquid-card">
+            <div class="content-z">
+                <h2 class="text-3xl font-bold text-slate-800 mb-2 flex items-center drop-shadow-sm">
+                    <svg class="w-8 h-8 mr-3 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                    The Odd One Out
+                </h2>
+                <p class="text-slate-700 mb-8 font-medium">Three words in each group are strongly related. Click the <strong>one word that does NOT belong</strong>.</p>
+                
+                <div id="odd-container" class="space-y-6">
+                    <!-- Dynamically generated by JS -->
+                </div>
             </div>
         </section>
 
         <!-- ==========================================
-             GAMES SECTION
+             GAMES SECTION 
              ========================================== -->
-        <div id="games" class="pt-8 border-t-2 border-dashed border-slate-200">
-            <h1 class="text-4xl font-lora font-bold text-center text-slate-800 mb-2">Interactive Game Zone</h1>
-            <p class="text-center text-slate-500 mb-12">Put your vocabulary to the test with these interactive challenges.</p>
+        <div id="games" class="pt-8 pb-12">
+            <h1 class="text-4xl md:text-5xl font-lora font-black text-center text-indigo-900 mb-2 drop-shadow-lg">Interactive Game Zone</h1>
+            <p class="text-center text-indigo-800 font-bold mb-12 bg-white/40 backdrop-blur-md px-6 py-2 rounded-full w-fit mx-auto border border-white/60">Put your vocabulary to the ultimate test.</p>
 
-            <!-- GAME 1: SENTENCE MAKER -->
-            <section class="bg-indigo-900 rounded-[2rem] p-8 shadow-xl text-white mb-12 relative overflow-hidden">
-                <div class="absolute -right-10 -top-10 opacity-10">
-                    <svg class="w-64 h-64" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L2 22h20L12 2z"></path></svg>
-                </div>
-                <h2 class="text-3xl font-bold mb-2 flex items-center relative z-10 text-indigo-100">
-                    Game 1: Sentence Maker
-                </h2>
-                <p class="text-indigo-200 mb-8 relative z-10">Unscramble the words to build a grammatically perfect Band 7+ sentence describing data.</p>
-                
-                <div class="bg-white/10 backdrop-blur-md p-6 rounded-2xl border border-white/20 relative z-10">
-                    <div class="flex justify-between items-center mb-4">
-                        <span class="text-sm font-bold text-indigo-300 uppercase tracking-widest">Level <span id="sm-level">1</span>/4</span>
-                        <span id="sm-status" class="font-bold text-emerald-400 hidden">✓ Perfect!</span>
+            <!-- GAME 1: VOCAB CLASH (Designer Clash Inspired) -->
+            <section class="liquid-card mb-12 !p-0">
+                <div class="content-z">
+                    <div class="bg-slate-900 text-white p-6 border-b border-slate-700">
+                        <h2 class="text-3xl font-bold flex items-center text-white">
+                            <svg class="w-8 h-8 mr-3 text-rose-500" fill="currentColor" viewBox="0 0 24 24"><path d="M11 2L2 22h8l2-8h8l-2-12H11zm3 10h-4l1-4h4l-1 4z"></path></svg>
+                            Game 1: Vocab Clash
+                        </h2>
+                        <p class="text-slate-400 mt-2">Team vs Team. Create a grammatically perfect sentence including BOTH words shown on the screen.</p>
                     </div>
+                    
+                    <div class="p-8">
+                        <div class="flex flex-col md:flex-row justify-between items-stretch bg-white/60 backdrop-blur-md p-6 rounded-3xl border border-white shadow-inner gap-8">
+                            <!-- Team A -->
+                            <div class="text-center flex flex-col items-center justify-center bg-white/80 p-6 rounded-2xl border-2 border-rose-200 shadow-sm w-full md:w-48">
+                                <h3 class="text-rose-600 font-black text-2xl tracking-widest uppercase">Team A</h3>
+                                <div class="text-6xl font-black text-slate-800 my-6 drop-shadow-md" id="score-a">0</div>
+                                <div class="flex gap-2 w-full">
+                                    <button onclick="changeScore('A', -1)" class="bg-rose-100 hover:bg-rose-200 text-rose-700 font-black text-xl py-2 flex-1 rounded-xl transition">-</button>
+                                    <button onclick="changeScore('A', 1)" class="bg-rose-500 hover:bg-rose-600 text-white font-black text-xl py-2 flex-1 rounded-xl transition shadow-md">+</button>
+                                </div>
+                            </div>
 
-                    <!-- Built Sentence Area -->
-                    <div class="bg-indigo-950/50 min-h-[80px] rounded-xl p-4 mb-6 border-2 border-indigo-500/50 flex flex-wrap gap-2 items-start" id="sm-answer-box">
-                        <!-- Clicked words go here -->
-                    </div>
+                            <!-- Center Clash Arena -->
+                            <div class="text-center flex-1 flex flex-col justify-center items-center">
+                                <div class="bg-slate-900 p-8 rounded-3xl border-4 border-indigo-400 shadow-2xl w-full relative overflow-hidden">
+                                    <div class="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
+                                    <h4 class="text-indigo-300 font-bold mb-6 uppercase tracking-widest relative z-10 text-sm">Target Words</h4>
+                                    
+                                    <div class="text-4xl md:text-5xl font-black text-white mb-4 relative z-10 drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]" id="clash-word-1">Ready?</div>
+                                    <div class="bg-indigo-600 text-white text-xs font-black px-3 py-1 rounded-full w-fit mx-auto my-4 relative z-10 border border-indigo-400">AND</div>
+                                    <div class="text-4xl md:text-5xl font-black text-white relative z-10 drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]" id="clash-word-2">Click Draw</div>
+                                </div>
+                                <button onclick="drawClashWords()" class="mt-8 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-black text-lg py-4 px-12 rounded-2xl shadow-[0_10px_20px_rgba(79,70,229,0.4)] transition-all transform hover:-translate-y-1 hover:scale-105 border border-indigo-400">
+                                    DRAW WORDS ⚔️
+                                </button>
+                            </div>
 
-                    <!-- Word Pool -->
-                    <div class="min-h-[80px] flex flex-wrap gap-3 justify-center mb-8" id="sm-word-pool">
-                        <!-- Scrambled words -->
-                    </div>
-
-                    <div class="flex justify-center gap-4">
-                        <button onclick="checkSentenceMaker()" class="bg-emerald-500 hover:bg-emerald-400 text-white font-bold py-3 px-8 rounded-xl shadow-lg transition-colors">
-                            Check Sentence
-                        </button>
-                        <button id="sm-next-btn" onclick="nextSentence()" class="bg-indigo-500 hover:bg-indigo-400 text-white font-bold py-3 px-8 rounded-xl shadow-lg transition-colors hidden">
-                            Next Level ➔
-                        </button>
+                            <!-- Team B -->
+                            <div class="text-center flex flex-col items-center justify-center bg-white/80 p-6 rounded-2xl border-2 border-sky-200 shadow-sm w-full md:w-48">
+                                <h3 class="text-sky-600 font-black text-2xl tracking-widest uppercase">Team B</h3>
+                                <div class="text-6xl font-black text-slate-800 my-6 drop-shadow-md" id="score-b">0</div>
+                                <div class="flex gap-2 w-full">
+                                    <button onclick="changeScore('B', -1)" class="bg-sky-100 hover:bg-sky-200 text-sky-700 font-black text-xl py-2 flex-1 rounded-xl transition">-</button>
+                                    <button onclick="changeScore('B', 1)" class="bg-sky-500 hover:bg-sky-600 text-white font-black text-xl py-2 flex-1 rounded-xl transition shadow-md">+</button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>
 
-            <!-- GAME 2: MEMORY MATCH -->
-            <section class="bg-slate-800 rounded-[2rem] p-8 shadow-xl text-white mb-12">
-                <h2 class="text-3xl font-bold mb-2 flex items-center text-sky-300">
-                    Game 2: Trend Memory Match
-                </h2>
-                <p class="text-slate-300 mb-8">Flip the cards to match the Academic Verb with its correct Synonym or Definition.</p>
-                
-                <div class="grid grid-cols-3 md:grid-cols-4 gap-4" id="memory-board">
-                    <!-- Cards injected by JS -->
-                </div>
-                
-                <div class="mt-8 flex justify-between items-center">
-                    <p class="font-bold text-slate-300 text-lg">Moves: <span id="memory-moves" class="text-white">0</span></p>
-                    <button onclick="initMemoryGame()" class="bg-sky-600 hover:bg-sky-500 text-white font-bold py-2 px-6 rounded-lg transition-colors">
-                        Restart Game
-                    </button>
-                </div>
-                <div id="memory-win" class="mt-6 text-center font-black text-2xl text-emerald-400 hidden fade-in">
-                    🎉 Excellent Memory! You cleared the board!
+            <!-- GAME 2: VOCAB MILLIONAIRE -->
+            <section class="liquid-card mb-12 !p-0">
+                <div class="content-z">
+                    <div class="bg-slate-900 text-white p-6 border-b border-slate-700">
+                        <h2 class="text-3xl font-bold flex items-center text-amber-400">
+                            <svg class="w-8 h-8 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            Game 2: Vocab Millionaire
+                        </h2>
+                        <p class="text-slate-400 mt-2">15 Questions. 4 Options. 1 Path to Academic Glory.</p>
+                    </div>
+
+                    <div class="p-4 md:p-8 bg-slate-900">
+                        <div class="flex flex-col lg:flex-row gap-6 bg-slate-800 rounded-3xl p-6 md:p-8 border-4 border-amber-500/30 relative overflow-hidden shadow-2xl">
+                            <!-- Background Glow -->
+                            <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-blue-600/20 rounded-full blur-[100px] pointer-events-none"></div>
+
+                            <!-- Main Question Area -->
+                            <div class="flex-1 flex flex-col justify-center relative z-10">
+                                <!-- Status Screen -->
+                                <div id="mil-start-screen" class="text-center">
+                                    <div class="text-6xl mb-6">🏆</div>
+                                    <h3 class="text-3xl font-black text-white mb-4">Are you ready to play?</h3>
+                                    <button onclick="startMillionaire()" class="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-900 font-black text-xl py-4 px-12 rounded-full shadow-[0_0_20px_rgba(251,191,36,0.5)] transition-all">START GAME</button>
+                                </div>
+
+                                <div id="mil-game-screen" class="hidden">
+                                    <!-- Question Box -->
+                                    <div class="bg-[#0f172a] border-2 border-amber-400/80 p-6 md:p-10 rounded-[50px] text-center text-white font-bold text-xl md:text-2xl mb-8 min-h-[120px] flex items-center justify-center shadow-[0_0_15px_rgba(251,191,36,0.2)]">
+                                        <span id="mil-question">Question goes here?</span>
+                                    </div>
+                                    <!-- Options -->
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="mil-options">
+                                        <!-- Buttons generated by JS -->
+                                    </div>
+                                </div>
+
+                                <div id="mil-end-screen" class="hidden text-center">
+                                    <h3 id="mil-end-msg" class="text-4xl font-black text-white mb-4">Game Over</h3>
+                                    <p class="text-amber-400 text-2xl font-bold mb-8">You won: <span id="mil-end-prize">£0</span></p>
+                                    <button onclick="startMillionaire()" class="bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-8 rounded-full border border-blue-400">Play Again</button>
+                                </div>
+                            </div>
+
+                            <!-- Ladder -->
+                            <div class="w-full lg:w-64 bg-[#0f172a]/90 rounded-2xl border border-blue-800/50 p-6 text-right font-mono flex flex-col-reverse justify-between relative z-10 shadow-inner text-sm md:text-base" id="mil-ladder">
+                                <!-- Steps generated by JS -->
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </section>
 
-            <!-- GAME 3: SPEED GAP FILL -->
-            <section class="bg-white rounded-[2rem] p-8 shadow-xl border border-slate-200 mb-12">
-                <h2 class="text-3xl font-bold mb-2 flex items-center text-slate-800">
-                    Game 3: The Missing Data
-                </h2>
-                <p class="text-slate-600 mb-8">Click a word from the bank, then it will automatically fill the next available blank in the paragraph. Complete the report!</p>
-                
-                <!-- Word Bank -->
-                <div class="bg-slate-100 p-6 rounded-2xl border border-slate-200 mb-8 flex flex-wrap gap-3 justify-center" id="gf-bank">
-                    <!-- Words injected here -->
-                </div>
+            <!-- GAME 3: SENTENCE MAKER -->
+            <section class="liquid-card mb-12 !p-0">
+                <div class="content-z">
+                    <div class="bg-indigo-900 text-white p-6 border-b border-indigo-800">
+                        <h2 class="text-3xl font-bold mb-2 flex items-center text-indigo-100">
+                            Game 3: Sentence Maker
+                        </h2>
+                        <p class="text-indigo-200">Unscramble the words to build a grammatically perfect Band 7+ sentence describing data.</p>
+                    </div>
+                    
+                    <div class="bg-white/80 p-8">
+                        <div class="flex justify-between items-center mb-4">
+                            <span class="text-sm font-bold text-indigo-500 uppercase tracking-widest">Level <span id="sm-level">1</span>/4</span>
+                            <span id="sm-status" class="font-bold text-emerald-500 hidden bg-emerald-50 px-3 py-1 rounded-lg border border-emerald-200">✓ Perfect!</span>
+                        </div>
 
-                <!-- Paragraph -->
-                <div class="bg-white border-2 border-indigo-100 p-8 rounded-2xl shadow-inner text-lg leading-loose text-slate-700 font-lora" id="gf-paragraph">
-                    <!-- Text with blanks injected here -->
-                </div>
+                        <div class="bg-slate-100 min-h-[80px] rounded-xl p-4 mb-6 border-2 border-slate-300 flex flex-wrap gap-2 items-start shadow-inner" id="sm-answer-box"></div>
+                        <div class="min-h-[80px] flex flex-wrap gap-3 justify-center mb-8" id="sm-word-pool"></div>
 
-                <div class="mt-8 flex justify-center gap-4">
-                    <button onclick="resetGapFill()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-3 px-8 rounded-xl transition-colors">
-                        Reset
-                    </button>
-                    <button onclick="checkGapFill()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-xl shadow-md transition-colors">
-                        Submit Report
-                    </button>
+                        <div class="flex justify-center gap-4">
+                            <button onclick="checkSentenceMaker()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-xl shadow-md transition-colors">
+                                Check Sentence
+                            </button>
+                            <button id="sm-next-btn" onclick="nextSentence()" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 px-8 rounded-xl shadow-md transition-colors hidden">
+                                Next Level ➔
+                            </button>
+                        </div>
+                    </div>
                 </div>
-                <div id="gf-feedback" class="mt-6 text-center font-bold text-lg hidden fade-in"></div>
+            </section>
+
+            <!-- GAME 4: MEMORY MATCH -->
+            <section class="liquid-card mb-12 !p-0">
+                <div class="content-z">
+                    <div class="bg-slate-800 text-white p-6 border-b border-slate-700">
+                        <h2 class="text-3xl font-bold mb-2 flex items-center text-sky-300">
+                            Game 4: Trend Memory Match
+                        </h2>
+                        <p class="text-slate-300">Flip the cards to match the Academic Verb with its correct Synonym or Definition.</p>
+                    </div>
+                    
+                    <div class="p-8 bg-white/60">
+                        <div class="grid grid-cols-3 md:grid-cols-4 gap-4" id="memory-board"></div>
+                        
+                        <div class="mt-8 flex justify-between items-center bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+                            <p class="font-bold text-slate-600 text-lg">Moves: <span id="memory-moves" class="text-indigo-600 font-black text-xl">0</span></p>
+                            <button onclick="initMemoryGame()" class="bg-sky-600 hover:bg-sky-700 text-white font-bold py-2.5 px-6 rounded-lg transition-colors shadow-sm">
+                                Restart Game
+                            </button>
+                        </div>
+                        <div id="memory-win" class="mt-6 text-center font-black text-2xl text-emerald-600 hidden fade-in bg-emerald-50 p-4 rounded-xl border border-emerald-200">
+                            🎉 Excellent Memory! You cleared the board!
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- GAME 5: SPEED GAP FILL -->
+            <section class="liquid-card mb-12 !p-0">
+                <div class="content-z">
+                    <div class="bg-emerald-900 text-white p-6 border-b border-emerald-800">
+                        <h2 class="text-3xl font-bold mb-2 flex items-center text-emerald-300">
+                            Game 5: The Missing Data
+                        </h2>
+                        <p class="text-emerald-100">Click a word from the bank, then it will automatically fill the next available blank in the paragraph. Complete the report!</p>
+                    </div>
+                    
+                    <div class="p-8 bg-white/80">
+                        <div class="bg-white p-6 rounded-2xl border border-slate-200 mb-8 flex flex-wrap gap-3 justify-center shadow-sm" id="gf-bank"></div>
+                        <div class="bg-slate-50 border-2 border-emerald-100 p-8 rounded-2xl shadow-inner text-lg leading-loose text-slate-700 font-lora" id="gf-paragraph"></div>
+
+                        <div class="mt-8 flex justify-center gap-4">
+                            <button onclick="resetGapFill()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-3 px-8 rounded-xl transition-colors">
+                                Reset
+                            </button>
+                            <button onclick="checkGapFill()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-8 rounded-xl shadow-md transition-colors">
+                                Submit Report
+                            </button>
+                        </div>
+                        <div id="gf-feedback" class="mt-6 text-center font-bold text-lg hidden fade-in p-4 rounded-xl border border-emerald-200 bg-emerald-50 text-emerald-700"></div>
+                    </div>
+                </div>
             </section>
         </div>
+
     </div>
 
     <!-- Logic and Data -->
     <script>
         /* =========================================================
-           1. DATA MODELS
+           1. DATA MODELS & FLASHCARD LOGIC
            ========================================================= */
         const flashcards = [
             { word: 'Rise', type: 'Verb / Noun', def: 'To move upwards or increase in amount.', example: 'Profits saw a steady rise.', cols: 'A steady rise, To rise sharply' },
@@ -324,162 +480,25 @@
             { word: 'Drop', type: 'Verb / Noun', def: 'To fall to a lower amount or value.', example: 'Temperatures dropped overnight.', cols: 'A sudden drop, Dropped slightly' },
             { word: 'Fall', type: 'Verb / Noun', def: 'To go down to a lower level or amount.', example: 'The number of accidents fell sharply.', cols: 'A steep fall, To fall dramatically' },
             { word: 'Decline', type: 'Verb / Noun', def: 'To gradually become less, worse, or lower.', example: 'Manufacturing jobs went into decline.', cols: 'A steady decline, Declined considerably' },
-            { word: 'Fluctuate / Fluctuation', type: 'Verb / Noun', def: 'To rise and fall irregularly in number or amount.', example: 'Temperatures fluctuated wildly during April.', cols: 'Fluctuated wildly, Minor fluctuations' },
+            { word: 'Fluctuate', type: 'Verb / Noun', def: 'To rise and fall irregularly in number or amount.', example: 'Temperatures fluctuated wildly during April.', cols: 'Fluctuated wildly, Minor fluctuations' },
             { word: 'Dip', type: 'Verb / Noun', def: 'To go down to a lower level temporarily, before recovering.', example: 'Sales dipped slightly in the summer.', cols: 'A brief dip, Dipped fractionally' },
-            { word: 'Remain steady', type: 'Phrase', def: 'To stay at the same level without fluctuating.', example: 'Prices remained steady throughout the year.', cols: 'Remained steady at 10%' },
-            { word: 'Remain stable', type: 'Phrase', def: 'To not change or fluctuate.', example: 'The proportion remained stable at 10%.', cols: 'Remained stable at, Relatively stable' },
-            { word: 'Remain unchanged', type: 'Phrase', def: 'To show no difference over a period of time.', example: 'The numbers remained unchanged for a decade.', cols: 'Remained unchanged throughout' },
             { word: 'Level off', type: 'Phrasal Verb', def: 'To stop rising or falling and become steady.', example: 'After a sharp rise, prices levelled off.', cols: 'Levelled off at 50%' },
-            { word: 'Peak at / Reach a peak', type: 'Phrase', def: 'To reach the highest point or value.', example: 'Sales reached a peak of $2M in December.', cols: 'Peaked at, Reached a peak of' },
-            { word: 'Hit a high of', type: 'Phrase', def: 'To attain a specific high level.', example: 'The stock hit a high of $50.', cols: 'Hit a record high of' },
-            { word: 'Hit a low of', type: 'Phrase', def: 'To reach a specific lowest value.', example: 'The temperature hit a low of -5°C.', cols: 'Hit an all-time low of' },
+            { word: 'Peak at', type: 'Phrase', def: 'To reach the highest point or value.', example: 'Sales reached a peak of $2M in December.', cols: 'Peaked at, Reached a peak of' },
             { word: 'Bottom out', type: 'Phrasal Verb', def: 'To reach the lowest point and stop falling.', example: 'The recession finally bottomed out in 2009.', cols: 'Bottomed out at 5 units' },
-            { word: 'Dramatically / Dramatic', type: 'Adverb / Adjective', def: 'Very sudden or noticeable change.', example: 'There was a dramatic increase in sales.', cols: 'Rose dramatically, Dramatic fall' },
-            { word: 'Sharply / Sharp', type: 'Adverb / Adjective', def: 'A sudden and rapid change.', example: 'A sharp drop in prices occurred.', cols: 'Fell sharply, A sharp climb' },
-            { word: 'Enormously / Enormous', type: 'Adverb / Adjective', def: 'Extremely large in size or amount.', example: 'The profits grew enormously.', cols: 'Grew enormously, Enormous growth' },
-            { word: 'Steeply / Steep', type: 'Adverb / Adjective', def: 'Rising or falling at a sharp angle; rapid.', example: 'Prices climbed steeply.', cols: 'A steep rise, Dropped steeply' },
-            { word: 'Substantially / Substantial', type: 'Adverb / Adjective', def: 'Large in amount or value.', example: 'There was a substantial rise in costs.', cols: 'Increased substantially, Substantial decline' },
-            { word: 'Considerably / Considerable', type: 'Adverb / Adjective', def: 'Large or of noticeable importance.', example: 'Numbers declined considerably.', cols: 'Considerable drop, Grew considerably' },
-            { word: 'Significantly / Significant', type: 'Adverb / Adjective', def: 'Large or important enough to be noticed.', example: 'A significant decline was seen.', cols: 'Significant increase, Dropped significantly' },
-            { word: 'Rapidly / Rapid', type: 'Adverb / Adjective', def: 'Happening in a short amount of time; fast.', example: 'The population increased rapidly.', cols: 'A rapid fall, Grew rapidly' },
-            { word: 'Moderately / Moderate', type: 'Adverb / Adjective', def: 'Average in amount, intensity, or degree.', example: 'Sales increased moderately.', cols: 'A moderate rise, Grew moderately' },
-            { word: 'Gradually / Gradual', type: 'Adverb / Adjective', def: 'Happening slowly over a period of time.', example: 'A gradual rise in temperature.', cols: 'A gradual decline, Increased gradually' },
-            { word: 'Slightly / Slight', type: 'Adverb / Adjective', def: 'Small in degree or amount.', example: 'There was a slight dip in the market.', cols: 'A slight drop, Increased slightly' },
-            { word: 'Fractionally / Fractional', type: 'Adverb / Adjective', def: 'To a very small degree.', example: 'Usage dipped fractionally in 2010.', cols: 'A fractional dip, Rose fractionally' }
+            { word: 'Dramatically', type: 'Adverb / Adjective', def: 'Very sudden or noticeable change.', example: 'There was a dramatic increase in sales.', cols: 'Rose dramatically, Dramatic fall' },
+            { word: 'Significantly', type: 'Adverb / Adjective', def: 'Large or important enough to be noticed.', example: 'A significant decline was seen.', cols: 'Significant increase, Dropped significantly' },
+            { word: 'Gradually', type: 'Adverb / Adjective', def: 'Happening slowly over a period of time.', example: 'A gradual rise in temperature.', cols: 'A gradual decline, Increased gradually' }
         ];
 
-        const rewrites = [
-            { original: "The prices fell sharply in 2008.", prompt1: "There was a", prompt2: "in prices in 2008.", ans: ["sharp", "fall"] },
-            { original: "The population grew steadily.", prompt1: "There was a", prompt2: "in the population.", ans: ["steady", "growth"] },
-            { original: "Sales fluctuated wildly.", prompt1: "There were", prompt2: "in sales.", ans: ["wild", "fluctuations"] },
-            { original: "Demand increased dramatically.", prompt1: "There was a", prompt2: "in demand.", ans: ["dramatic", "increase"] },
-            { original: "Prices climbed steeply.", prompt1: "There was a", prompt2: "in prices.", ans: ["steep", "climb"] },
-            { original: "Numbers declined considerably.", prompt1: "There was a", prompt2: "in numbers.", ans: ["considerable", "decline"] },
-            { original: "Usage dipped fractionally.", prompt1: "There was a", prompt2: "in usage.", ans: ["fractional", "dip"] },
-            { original: "The rate rose enormously.", prompt1: "There was an", prompt2: "in the rate.", ans: ["enormous", "rise"] },
-            { original: "Production fell rapidly.", prompt1: "There was a", prompt2: "in production.", ans: ["rapid", "fall"] }
-        ];
-
-        const guessers = [
-            { chart: [10, 9.5, 9, 8.5, 8, 7.5], options: ["A sudden plummet", "A gradual decline", "A slight dip"], correct: "A gradual decline" },
-            { chart: [2, 10, 3, 9, 2, 8], options: ["Wild fluctuations", "A steady climb", "A dramatic peak"], correct: "Wild fluctuations" },
-            { chart: [5, 5, 5.1, 5, 5, 5], options: ["A sharp surge", "A steady plateau", "An erratic trajectory"], correct: "A steady plateau" },
-            { chart: [10, 5, 2, 2, 3, 5], options: ["Bottomed out", "Levelled off", "Hit a peak"], correct: "Bottomed out" },
-            { chart: [2, 5, 10, 9, 6, 4], options: ["Remained stable", "A steep climb", "Reached a peak"], correct: "Reached a peak" },
-            { chart: [2, 3, 4, 8, 15, 20], options: ["A steep climb", "A gradual rise", "A slight fluctuation"], correct: "A steep climb" }
-        ];
-
-        // MULTIPLE COLLOCATION SETS
-        const collocationSets = [
-            {
-                name: "Degree & Speed",
-                pairs: [
-                    { left: "A dramatic", right: "surge in prices." },
-                    { left: "A gradual", right: "decline over ten years." },
-                    { left: "Wild", right: "fluctuations throughout the period." },
-                    { left: "A steady", right: "growth in the population." },
-                    { left: "A sharp", right: "drop in overall sales." }
-                ]
-            },
-            {
-                name: "Extremes & Stability",
-                pairs: [
-                    { left: "Reached a", right: "peak of 50%." },
-                    { left: "Bottomed", right: "out at 10 units." },
-                    { left: "Levelled", right: "off after a brief rise." },
-                    { left: "Remained", right: "relatively stable." },
-                    { left: "Hit an", right: "all-time low." }
-                ]
-            },
-            {
-                name: "Verbs + Adverbs",
-                pairs: [
-                    { left: "Increased", right: "significantly over the decade." },
-                    { left: "Fell", right: "sharply during the recession." },
-                    { left: "Fluctuated", right: "wildly in the first quarter." },
-                    { left: "Rose", right: "steadily until 2015." },
-                    { left: "Declined", right: "moderately before recovering." }
-                ]
-            },
-            {
-                name: "Proportions",
-                pairs: [
-                    { left: "A tiny", right: "fraction of the total." },
-                    { left: "The vast", right: "majority of respondents." },
-                    { left: "Exactly", right: "a quarter of the budget." },
-                    { left: "Roughly", right: "one-third of the pie." },
-                    { left: "Accounted", right: "for the largest segment." }
-                ]
-            },
-            {
-                name: "Prepositions",
-                pairs: [
-                    { left: "An increase", right: "of exactly 15 percent." },
-                    { left: "Dropped", right: "by almost 10 units." },
-                    { left: "Stood", right: "at 500 in the beginning." },
-                    { left: "Rose", right: "from 10 to 20 overall." },
-                    { left: "Oscillated", right: "between 30 and 40." }
-                ]
-            }
-        ];
-
-        const wordWebsData = [
-            {
-                title: "UPWARD TRENDS (Verbs/Nouns)",
-                instruction: "Select the 4 words that indicate an upward movement.",
-                options: ["Rise", "Plummet", "Climb", "Dip", "Grow", "Drop", "Soar", "Slump"],
-                correct: ["Rise", "Climb", "Grow", "Soar"]
-            },
-            {
-                title: "DOWNWARD TRENDS (Verbs/Nouns)",
-                instruction: "Select the 4 words that indicate a downward movement.",
-                options: ["Fall", "Surge", "Decline", "Decrease", "Peak", "Go up", "Drop", "Grow"],
-                correct: ["Fall", "Decline", "Decrease", "Drop"]
-            },
-            {
-                title: "STABILITY & FLAT TRENDS",
-                instruction: "Select the 3 phrases/words that indicate no significant change.",
-                options: ["Fluctuate", "Level off", "Remain steady", "Oscillate", "Plateau", "Dip"],
-                correct: ["Level off", "Remain steady", "Plateau"]
-            }
-        ];
-
-        const oddOneOutData = [
-            {
-                topic: "SPEED OF CHANGE (FAST)",
-                options: ["Rapid", "Sudden", "Gradual", "Sharp"],
-                wrong: "Gradual",
-                reason: "'Gradual' means slow and steady, while the others mean fast or sudden."
-            },
-            {
-                topic: "DEGREE OF CHANGE (LARGE)",
-                options: ["Enormous", "Substantial", "Significant", "Fractional"],
-                wrong: "Fractional",
-                reason: "'Fractional' means very small, while the others mean very large."
-            },
-            {
-                topic: "VOLATILITY",
-                options: ["Fluctuate", "Oscillate", "Erratic", "Stable"],
-                wrong: "Stable",
-                reason: "'Stable' means unchanging, while the others refer to moving up and down unpredictably."
-            }
-        ];
-
-        /* =========================================================
-           2. FLASHCARD LOGIC
-           ========================================================= */
         let currentCard = 0;
         let isFlipped = false;
-
         const fcInner = document.getElementById('flashcard-inner');
         const fcWord = document.getElementById('fc-word');
         const fcType = document.getElementById('fc-type');
         const fcDef = document.getElementById('fc-def');
         const fcCols = document.getElementById('fc-cols');
         const fcCurrent = document.getElementById('card-current');
-        const fcTotal = document.getElementById('card-total');
-
-        fcTotal.innerText = flashcards.length;
+        document.getElementById('card-total').innerText = flashcards.length;
 
         function updateCardUI() {
             const card = flashcards[currentCard];
@@ -496,25 +515,22 @@
             fcInner.style.transform = isFlipped ? 'rotateY(180deg)' : 'rotateY(0deg)';
         }
 
-        function nextCard() {
-            currentCard = (currentCard + 1) % flashcards.length;
-            resetAndFlip();
-        }
-
-        function prevCard() {
-            currentCard = currentCard === 0 ? flashcards.length - 1 : currentCard - 1;
-            resetAndFlip();
-        }
-
-        function resetAndFlip() {
-            isFlipped = false;
-            fcInner.style.transform = 'rotateY(0deg)';
-            setTimeout(updateCardUI, 150);
-        }
+        function nextCard() { currentCard = (currentCard + 1) % flashcards.length; resetAndFlip(); }
+        function prevCard() { currentCard = currentCard === 0 ? flashcards.length - 1 : currentCard - 1; resetAndFlip(); }
+        function resetAndFlip() { isFlipped = false; fcInner.style.transform = 'rotateY(0deg)'; setTimeout(updateCardUI, 150); }
 
         /* =========================================================
            3. REWRITES LOGIC
            ========================================================= */
+        const rewrites = [
+            { original: "The prices fell sharply in 2008.", prompt1: "There was a", prompt2: "in prices in 2008.", ans: ["sharp", "fall"] },
+            { original: "The population grew steadily.", prompt1: "There was a", prompt2: "in the population.", ans: ["steady", "growth"] },
+            { original: "Sales fluctuated wildly.", prompt1: "There were", prompt2: "in sales.", ans: ["wild", "fluctuations"] },
+            { original: "Demand increased dramatically.", prompt1: "There was a", prompt2: "in demand.", ans: ["dramatic", "increase"] },
+            { original: "Prices climbed steeply.", prompt1: "There was a", prompt2: "in prices.", ans: ["steep", "climb"] },
+            { original: "Numbers declined considerably.", prompt1: "There was a", prompt2: "in numbers.", ans: ["considerable", "decline"] }
+        ];
+
         const rewriteContainer = document.getElementById('rewrite-container');
         rewrites.forEach((rw, idx) => {
             let inputsHtml = rw.ans.map((_, iIdx) => 
@@ -522,12 +538,12 @@
             ).join('');
 
             rewriteContainer.innerHTML += `
-                <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200 flex flex-col lg:flex-row lg:items-center gap-6">
+                <div class="bg-white/60 backdrop-blur-md p-6 rounded-2xl border border-white/80 shadow-sm flex flex-col lg:flex-row lg:items-center gap-6">
                     <div class="flex-1">
                         <div class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">Original Verb/Adverb:</div>
                         <p class="font-lora text-lg font-bold text-slate-800 italic border-l-4 border-emerald-400 pl-3">"${rw.original}"</p>
                     </div>
-                    <div class="flex-1 bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-wrap items-center gap-y-3 relative text-lg">
+                    <div class="flex-1 bg-white/80 p-5 rounded-xl border border-white shadow-sm flex flex-wrap items-center gap-y-3 relative text-lg">
                         <span class="font-medium text-slate-700 mr-2">${rw.prompt1}</span>
                         ${inputsHtml}
                         <span class="font-medium text-slate-700 ml-2">${rw.prompt2}</span>
@@ -543,9 +559,11 @@
                 rw.ans.forEach((ansText, iIdx) => {
                     const input = document.getElementById(`rw-${idx}-${iIdx}`);
                     if (input.value.trim().toLowerCase() === ansText.toLowerCase()) {
-                        input.className = "border-b-2 bg-emerald-50 text-center font-bold outline-none w-32 mx-1 transition-colors input-correct rounded-t";
+                        input.classList.add('input-correct');
+                        input.classList.remove('input-incorrect');
                     } else {
-                        input.className = "border-b-2 bg-rose-50 text-center font-bold outline-none w-32 mx-1 transition-colors input-incorrect rounded-t";
+                        input.classList.add('input-incorrect');
+                        input.classList.remove('input-correct');
                         allCorrect = false;
                     }
                 });
@@ -554,7 +572,7 @@
                 feedback.classList.remove('hidden');
                 if (allCorrect) {
                     feedback.className = "w-full mt-3 text-sm font-bold text-emerald-600 fade-in flex items-center";
-                    feedback.innerHTML = `<svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg> Perfect Rewrite!`;
+                    feedback.innerHTML = `✓ Perfect Rewrite!`;
                 } else {
                     feedback.className = "w-full mt-3 text-sm font-bold text-rose-600 bg-rose-50 px-3 py-2 rounded-lg border border-rose-200 fade-in flex items-center";
                     feedback.innerHTML = `Correct Form: ${rw.ans.join(' ')}`;
@@ -565,17 +583,23 @@
         /* =========================================================
            4. VISUAL TREND GUESSER LOGIC
            ========================================================= */
+        const guessers = [
+            { chart: [10, 9.5, 9, 8.5, 8, 7.5], options: ["A sudden plummet", "A gradual decline", "A slight dip"], correct: "A gradual decline" },
+            { chart: [2, 10, 3, 9, 2, 8], options: ["Wild fluctuations", "A steady climb", "A dramatic peak"], correct: "Wild fluctuations" },
+            { chart: [5, 5, 5.1, 5, 5, 5], options: ["A sharp surge", "A steady plateau", "An erratic trajectory"], correct: "A steady plateau" }
+        ];
+
         const guesserContainer = document.getElementById('guesser-container');
         let userGuesses = {};
         
         guessers.forEach((gs, idx) => {
             let optionsHtml = gs.options.map((opt, oIdx) => 
-                `<button id="btn-gs-${idx}-${oIdx}" onclick="selectGuess(${idx}, '${opt}', ${oIdx})" class="w-full text-left px-4 py-2.5 rounded-xl font-semibold border-2 border-slate-200 bg-white text-slate-600 hover:border-amber-300 transition-colors mb-2">${opt}</button>`
+                `<button id="btn-gs-${idx}-${oIdx}" onclick="selectGuess(${idx}, '${opt}', ${oIdx})" class="w-full text-left px-4 py-2.5 rounded-xl font-semibold border-2 border-white/80 bg-white/60 text-slate-700 hover:bg-white transition-colors mb-2 shadow-sm">${opt}</button>`
             ).join('');
 
             guesserContainer.innerHTML += `
-                <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200 flex flex-col">
-                    <div class="bg-white rounded-xl p-3 shadow-sm border border-slate-100 mb-5 relative h-32 w-full">
+                <div class="bg-white/40 backdrop-blur-md p-5 rounded-2xl border border-white/60 shadow-sm flex flex-col">
+                    <div class="bg-white/80 rounded-xl p-3 shadow-inner border border-white mb-5 relative h-32 w-full">
                         <canvas id="chart-${idx}"></canvas>
                     </div>
                     <div class="mt-auto">
@@ -586,10 +610,8 @@
             `;
         });
 
-        // Initialize Charts
         guessers.forEach((gs, idx) => {
-            const ctx = document.getElementById(`chart-${idx}`).getContext('2d');
-            new Chart(ctx, {
+            new Chart(document.getElementById(`chart-${idx}`).getContext('2d'), {
                 type: 'line',
                 data: { labels: ['1','2','3','4','5','6'], datasets: [{ data: gs.chart, borderColor: '#f59e0b', tension: 0.3, borderWidth: 3 }] },
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { enabled: false } }, scales: { x: { display: false }, y: { display: false } }, animation: false }
@@ -600,17 +622,11 @@
             userGuesses[qIdx] = selectedOpt;
             const gs = guessers[qIdx];
             
-            // Reset buttons
             gs.options.forEach((_, i) => {
-                const btn = document.getElementById(`btn-gs-${qIdx}-${i}`);
-                btn.className = "w-full text-left px-4 py-2.5 rounded-xl font-semibold border-2 border-slate-200 bg-white text-slate-600 hover:border-amber-300 transition-colors mb-2";
+                document.getElementById(`btn-gs-${qIdx}-${i}`).className = "w-full text-left px-4 py-2.5 rounded-xl font-semibold border-2 border-white/80 bg-white/60 text-slate-700 hover:bg-white transition-colors mb-2 shadow-sm";
             });
+            document.getElementById(`btn-gs-${qIdx}-${btnIdx}`).className = "w-full text-left px-4 py-2.5 rounded-xl font-semibold border-2 border-amber-400 bg-amber-50 text-amber-900 transition-colors mb-2 shadow-sm";
 
-            // Highlight selected
-            const activeBtn = document.getElementById(`btn-gs-${qIdx}-${btnIdx}`);
-            activeBtn.className = "w-full text-left px-4 py-2.5 rounded-xl font-semibold border-2 border-amber-400 bg-amber-50 text-amber-900 transition-colors mb-2";
-
-            // Show feedback
             const feedback = document.getElementById(`guess-feedback-${qIdx}`);
             feedback.classList.remove('hidden');
             if (selectedOpt === gs.correct) {
@@ -623,139 +639,30 @@
         }
 
         /* =========================================================
-           5. MULTIPLE COLLOCATION MATCHERS
+           5. WORD WEBS LOGIC
            ========================================================= */
-        let currentCollocSetIndex = 0;
-        let shuffledLeft = [];
-        let shuffledRight = [];
-        let activeLeftId = null;
-        let activeRightId = null;
-        let matchedIds = [];
+        const wordWebsData = [
+            { title: "UPWARD TRENDS", instruction: "Select the 4 words that indicate upward movement.", options: ["Rise", "Plummet", "Climb", "Dip", "Grow", "Drop", "Soar", "Slump"], correct: ["Rise", "Climb", "Grow", "Soar"] },
+            { title: "DOWNWARD TRENDS", instruction: "Select the 4 words that indicate downward movement.", options: ["Fall", "Surge", "Decline", "Decrease", "Peak", "Go up", "Drop", "Grow"], correct: ["Fall", "Decline", "Decrease", "Drop"] }
+        ];
 
-        const collocSetNav = document.getElementById('colloc-set-nav');
-        const collocLeft = document.getElementById('colloc-left');
-        const collocRight = document.getElementById('colloc-right');
-        const collocFeedback = document.getElementById('colloc-feedback');
-
-        function initCollocationSets() {
-            collocSetNav.innerHTML = collocationSets.map((set, idx) => `
-                <button onclick="loadCollocSet(${idx})" id="colloc-btn-${idx}" class="px-4 py-2 rounded-full font-semibold border-2 transition-colors text-sm ${idx === 0 ? 'bg-purple-600 text-white border-purple-600' : 'bg-white text-slate-600 border-slate-200 hover:border-purple-300'}">
-                    Set ${idx + 1}: ${set.name}
-                </button>
-            `).join('');
-            loadCollocSet(0);
-        }
-
-        function loadCollocSet(index) {
-            currentCollocSetIndex = index;
-            matchedIds = [];
-            activeLeftId = null;
-            activeRightId = null;
-            collocFeedback.classList.add('hidden');
-            
-            // Update nav buttons
-            collocationSets.forEach((_, idx) => {
-                const btn = document.getElementById(`colloc-btn-${idx}`);
-                if(idx === index) {
-                    btn.className = "px-4 py-2 rounded-full font-semibold border-2 bg-purple-600 text-white border-purple-600 text-sm";
-                } else {
-                    btn.className = "px-4 py-2 rounded-full font-semibold border-2 bg-white text-slate-600 border-slate-200 hover:border-purple-300 text-sm transition-colors";
-                }
-            });
-
-            // Prepare data with IDs
-            const currentData = collocationSets[index].pairs.map((p, i) => ({...p, id: i}));
-            shuffledLeft = [...currentData].sort(() => Math.random() - 0.5);
-            shuffledRight = [...currentData].sort(() => Math.random() - 0.5);
-
-            renderCollocations();
-        }
-
-        function renderCollocations() {
-            collocLeft.innerHTML = '';
-            collocRight.innerHTML = '';
-
-            shuffledLeft.forEach((item) => {
-                const isMatched = matchedIds.includes(item.id);
-                const isSelected = activeLeftId === item.id;
-                let classes = "w-full text-left px-5 py-4 rounded-xl font-bold border-2 transition-all shadow-sm ";
-                
-                if (isMatched) classes += "bg-emerald-100 border-emerald-400 text-emerald-800 opacity-70 cursor-default";
-                else if (isSelected) classes += "bg-indigo-100 border-indigo-500 text-indigo-900";
-                else classes += "bg-white border-slate-200 text-slate-700 hover:border-indigo-300 cursor-pointer";
-
-                collocLeft.innerHTML += `<button onclick="handleCollocClick('left', ${item.id})" class="${classes}" ${isMatched ? 'disabled' : ''}>${item.left}</button>`;
-            });
-
-            shuffledRight.forEach((item) => {
-                const isMatched = matchedIds.includes(item.id);
-                const isSelected = activeRightId === item.id;
-                let classes = "w-full text-left px-5 py-4 rounded-xl font-bold border-2 transition-all shadow-sm ";
-                
-                if (isMatched) classes += "bg-emerald-100 border-emerald-400 text-emerald-800 opacity-70 cursor-default";
-                else if (isSelected) classes += "bg-indigo-100 border-indigo-500 text-indigo-900";
-                else classes += "bg-white border-slate-200 text-slate-700 hover:border-indigo-300 cursor-pointer";
-
-                collocRight.innerHTML += `<button onclick="handleCollocClick('right', ${item.id})" class="${classes}" ${isMatched ? 'disabled' : ''}>${item.right}</button>`;
-            });
-
-            if (matchedIds.length === 5) { // 5 pairs per set
-                collocFeedback.classList.remove('hidden');
-                collocFeedback.className = "mt-6 text-center font-black text-xl text-emerald-600 fade-in";
-                collocFeedback.innerHTML = "🎉 All Collocations Matched!";
-            }
-        }
-
-        function handleCollocClick(side, id) {
-            if (matchedIds.includes(id)) return;
-            if (side === 'left') activeLeftId = (activeLeftId === id) ? null : id;
-            if (side === 'right') activeRightId = (activeRightId === id) ? null : id;
-
-            renderCollocations();
-
-            if (activeLeftId !== null && activeRightId !== null) {
-                setTimeout(checkCollocMatch, 300); // slight delay for UX
-            }
-        }
-
-        function checkCollocMatch() {
-            if (activeLeftId === activeRightId) {
-                matchedIds.push(activeLeftId);
-                activeLeftId = null;
-                activeRightId = null;
-            } else {
-                activeLeftId = null;
-                activeRightId = null;
-            }
-            renderCollocations();
-        }
-
-        initCollocationSets();
-
-        /* =========================================================
-           6. SEMANTIC WORD WEBS LOGIC
-           ========================================================= */
         const websContainer = document.getElementById('wordwebs-container');
         let webSelections = {};
 
         wordWebsData.forEach((web, wIdx) => {
             webSelections[wIdx] = [];
-            let buttonsHtml = web.options.map((opt, oIdx) => 
-                `<button id="btn-web-${wIdx}-${oIdx}" onclick="toggleWebSelect(${wIdx}, '${opt}', ${oIdx})" class="btn-selectable px-5 py-3 rounded-xl font-semibold bg-white text-slate-700 shadow-sm">${opt}</button>`
-            ).join('');
+            let buttonsHtml = web.options.map((opt, oIdx) => `<button id="btn-web-${wIdx}-${oIdx}" onclick="toggleWebSelect(${wIdx}, '${opt}', ${oIdx})" class="btn-selectable px-5 py-3 rounded-xl font-semibold bg-white/80 backdrop-blur-sm text-slate-700 shadow-sm">${opt}</button>`).join('');
 
             websContainer.innerHTML += `
-                <div class="bg-indigo-50/50 p-6 rounded-2xl border border-indigo-100">
+                <div class="bg-indigo-50/40 backdrop-blur-md p-6 rounded-2xl border border-indigo-100/50 shadow-inner">
                     <div class="mb-4">
                         <span class="bg-indigo-600 text-white px-3 py-1 rounded-md text-xs font-bold uppercase tracking-wider mr-2">Target</span>
                         <span class="text-xl font-black text-slate-800">${web.title}</span>
                     </div>
-                    <p class="text-sm text-slate-600 mb-4">${web.instruction}</p>
-                    <div class="flex flex-wrap gap-3 mb-6">
-                        ${buttonsHtml}
-                    </div>
+                    <p class="text-sm text-slate-700 font-medium mb-4">${web.instruction}</p>
+                    <div class="flex flex-wrap gap-3 mb-6">${buttonsHtml}</div>
                     <div class="flex items-center gap-4">
-                        <button onclick="checkWeb(${wIdx})" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-6 rounded-lg shadow transition-colors">Check Selection</button>
+                        <button onclick="checkWeb(${wIdx})" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 px-8 rounded-xl shadow-md transition-colors">Check Selection</button>
                         <div id="web-feedback-${wIdx}" class="text-sm font-bold hidden"></div>
                     </div>
                 </div>
@@ -765,13 +672,10 @@
         function toggleWebSelect(wIdx, opt, btnIdx) {
             const btn = document.getElementById(`btn-web-${wIdx}-${btnIdx}`);
             const selections = webSelections[wIdx];
-            
             if (selections.includes(opt)) {
-                // Deselect
                 webSelections[wIdx] = selections.filter(item => item !== opt);
                 btn.classList.remove('btn-selected');
             } else {
-                // Select
                 if (selections.length < wordWebsData[wIdx].correct.length) {
                     webSelections[wIdx].push(opt);
                     btn.classList.add('btn-selected');
@@ -781,63 +685,128 @@
 
         function checkWeb(wIdx) {
             const web = wordWebsData[wIdx];
-            const selections = webSelections[wIdx];
             const feedback = document.getElementById(`web-feedback-${wIdx}`);
-            
             feedback.classList.remove('hidden');
             
-            if (selections.length < web.correct.length) {
-                feedback.className = "text-sm font-bold text-amber-600";
-                feedback.innerHTML = `Please select exactly ${web.correct.length} words.`;
+            if (webSelections[wIdx].length < web.correct.length) {
+                feedback.className = "text-sm font-bold text-amber-600 bg-amber-50 px-3 py-1.5 rounded-lg border border-amber-200";
+                feedback.innerHTML = `Select exactly ${web.correct.length} words.`;
                 return;
             }
 
-            // Verify
             let allCorrect = true;
             web.options.forEach((opt, oIdx) => {
                 const btn = document.getElementById(`btn-web-${wIdx}-${oIdx}`);
-                const isSelected = selections.includes(opt);
+                const isSelected = webSelections[wIdx].includes(opt);
                 const isCorrectAns = web.correct.includes(opt);
 
-                if (isSelected && isCorrectAns) {
-                    btn.className = "px-5 py-3 rounded-xl font-semibold shadow-sm btn-correct";
-                } else if (isSelected && !isCorrectAns) {
-                    btn.className = "px-5 py-3 rounded-xl font-semibold shadow-sm btn-wrong";
-                    allCorrect = false;
-                } else if (!isSelected && isCorrectAns) {
-                    btn.className = "px-5 py-3 rounded-xl font-semibold shadow-sm border-2 border-emerald-500 text-emerald-700 bg-white"; // Highlight missed correct answers
-                    allCorrect = false;
-                } else {
-                    btn.className = "px-5 py-3 rounded-xl font-semibold bg-white text-slate-400 border-2 border-slate-100 opacity-50";
-                }
-                btn.disabled = true; // Lock after checking
+                if (isSelected && isCorrectAns) { btn.className = "px-5 py-3 rounded-xl font-semibold shadow-sm btn-correct"; } 
+                else if (isSelected && !isCorrectAns) { btn.className = "px-5 py-3 rounded-xl font-semibold shadow-sm btn-wrong"; allCorrect = false; } 
+                else if (!isSelected && isCorrectAns) { btn.className = "px-5 py-3 rounded-xl font-semibold shadow-sm border-2 border-emerald-500 text-emerald-700 bg-emerald-50"; allCorrect = false; } 
+                else { btn.className = "px-5 py-3 rounded-xl font-semibold bg-white/40 text-slate-400 border-2 border-slate-100 opacity-50"; }
+                btn.disabled = true;
             });
 
-            if (allCorrect) {
-                feedback.className = "text-sm font-bold text-emerald-600 fade-in";
-                feedback.innerHTML = "Perfect mapping!";
-            } else {
-                feedback.className = "text-sm font-bold text-rose-600 fade-in";
-                feedback.innerHTML = "Not quite. See the correct answers highlighted.";
+            feedback.className = allCorrect ? "text-sm font-bold text-emerald-600 fade-in" : "text-sm font-bold text-rose-600 fade-in";
+            feedback.innerHTML = allCorrect ? "Perfect mapping!" : "Not quite. See the correct answers highlighted.";
+        }
+
+        /* =========================================================
+           6. COLLOCATION MATCHER
+           ========================================================= */
+        const collocationSets = [
+            { name: "Degree & Speed", pairs: [{ left: "A dramatic", right: "surge in prices." }, { left: "A gradual", right: "decline over ten years." }, { left: "Wild", right: "fluctuations throughout the period." }, { left: "A steady", right: "growth in the population." }, { left: "A sharp", right: "drop in overall sales." }] },
+            { name: "Extremes", pairs: [{ left: "Reached a", right: "peak of 50%." }, { left: "Bottomed", right: "out at 10 units." }, { left: "Levelled", right: "off after a brief rise." }, { left: "Remained", right: "relatively stable." }, { left: "Hit an", right: "all-time low." }] }
+        ];
+
+        let currentCollocSetIndex = 0;
+        let matchedIds = [];
+        let activeLeftId = null;
+        let activeRightId = null;
+        let shuffledLeft = [];
+        let shuffledRight = [];
+
+        function initCollocationSets() {
+            document.getElementById('colloc-set-nav').innerHTML = collocationSets.map((set, idx) => `<button onclick="loadCollocSet(${idx})" id="colloc-btn-${idx}" class="px-5 py-2.5 rounded-full font-bold shadow-sm transition-colors text-sm ${idx === 0 ? 'bg-purple-600 text-white' : 'bg-white/80 text-slate-700 hover:bg-white'}">Set ${idx + 1}: ${set.name}</button>`).join('');
+            loadCollocSet(0);
+        }
+
+        function loadCollocSet(index) {
+            currentCollocSetIndex = index;
+            matchedIds = [];
+            activeLeftId = null;
+            activeRightId = null;
+            document.getElementById('colloc-feedback').classList.add('hidden');
+            
+            collocationSets.forEach((_, idx) => {
+                document.getElementById(`colloc-btn-${idx}`).className = idx === index ? "px-5 py-2.5 rounded-full font-bold shadow-sm transition-colors text-sm bg-purple-600 text-white" : "px-5 py-2.5 rounded-full font-bold shadow-sm transition-colors text-sm bg-white/80 text-slate-700 hover:bg-white";
+            });
+
+            const currentData = collocationSets[index].pairs.map((p, i) => ({...p, id: i}));
+            shuffledLeft = [...currentData].sort(() => Math.random() - 0.5);
+            shuffledRight = [...currentData].sort(() => Math.random() - 0.5);
+            renderCollocations();
+        }
+
+        function renderCollocations() {
+            const leftEl = document.getElementById('colloc-left');
+            const rightEl = document.getElementById('colloc-right');
+            leftEl.innerHTML = ''; rightEl.innerHTML = '';
+
+            shuffledLeft.forEach((item) => {
+                const isMatched = matchedIds.includes(item.id);
+                const isSelected = activeLeftId === item.id;
+                let cls = "w-full text-left px-5 py-4 rounded-xl font-bold border-2 transition-all shadow-sm ";
+                cls += isMatched ? "bg-emerald-100 border-emerald-400 text-emerald-800 opacity-60 cursor-default" : isSelected ? "bg-indigo-100 border-indigo-500 text-indigo-900" : "bg-white/90 border-white text-slate-700 hover:bg-white cursor-pointer";
+                leftEl.innerHTML += `<button onclick="handleCollocClick('left', ${item.id})" class="${cls}" ${isMatched ? 'disabled' : ''}>${item.left}</button>`;
+            });
+
+            shuffledRight.forEach((item) => {
+                const isMatched = matchedIds.includes(item.id);
+                const isSelected = activeRightId === item.id;
+                let cls = "w-full text-left px-5 py-4 rounded-xl font-bold border-2 transition-all shadow-sm ";
+                cls += isMatched ? "bg-emerald-100 border-emerald-400 text-emerald-800 opacity-60 cursor-default" : isSelected ? "bg-indigo-100 border-indigo-500 text-indigo-900" : "bg-white/90 border-white text-slate-700 hover:bg-white cursor-pointer";
+                rightEl.innerHTML += `<button onclick="handleCollocClick('right', ${item.id})" class="${cls}" ${isMatched ? 'disabled' : ''}>${item.right}</button>`;
+            });
+
+            if (matchedIds.length === 5) {
+                const fb = document.getElementById('colloc-feedback');
+                fb.classList.remove('hidden');
+                fb.className = "mt-6 text-center font-black text-xl text-emerald-600 bg-emerald-50 py-3 rounded-xl border border-emerald-200 fade-in";
+                fb.innerHTML = "🎉 All Collocations Matched!";
             }
         }
+
+        function handleCollocClick(side, id) {
+            if (matchedIds.includes(id)) return;
+            if (side === 'left') activeLeftId = (activeLeftId === id) ? null : id;
+            if (side === 'right') activeRightId = (activeRightId === id) ? null : id;
+            renderCollocations();
+            if (activeLeftId !== null && activeRightId !== null) setTimeout(checkCollocMatch, 300);
+        }
+
+        function checkCollocMatch() {
+            if (activeLeftId === activeRightId) { matchedIds.push(activeLeftId); }
+            activeLeftId = null; activeRightId = null;
+            renderCollocations();
+        }
+        initCollocationSets();
 
         /* =========================================================
            7. ODD ONE OUT LOGIC
            ========================================================= */
-        const oddContainer = document.getElementById('odd-container');
-        
-        oddOneOutData.forEach((odd, idx) => {
-            let optionsHtml = odd.options.map((opt, oIdx) => 
-                `<button id="btn-odd-${idx}-${oIdx}" onclick="selectOdd(${idx}, '${opt}', ${oIdx})" class="px-5 py-3 rounded-xl font-semibold bg-white border-2 border-slate-200 text-slate-700 hover:border-slate-400 shadow-sm transition-all">${opt}</button>`
-            ).join('');
+        const oddOneOutData = [
+            { topic: "SPEED OF CHANGE", options: ["Rapid", "Sudden", "Gradual", "Sharp"], wrong: "Gradual", reason: "'Gradual' means slow and steady, while the others mean fast or sudden." },
+            { topic: "DEGREE OF CHANGE", options: ["Enormous", "Substantial", "Significant", "Fractional"], wrong: "Fractional", reason: "'Fractional' means very small, while the others mean very large." }
+        ];
 
+        const oddContainer = document.getElementById('odd-container');
+        oddOneOutData.forEach((odd, idx) => {
+            let optionsHtml = odd.options.map((opt, oIdx) => `<button id="btn-odd-${idx}-${oIdx}" onclick="selectOdd(${idx}, '${opt}', ${oIdx})" class="px-5 py-3 rounded-xl font-semibold bg-white/80 backdrop-blur-sm border border-white text-slate-700 hover:bg-white shadow-sm transition-all">${opt}</button>`).join('');
             oddContainer.innerHTML += `
-                <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200">
-                    <div class="mb-4 text-xs font-black text-slate-500 uppercase tracking-widest bg-white border border-slate-200 px-3 py-1 rounded inline-block">Category: ${odd.topic}</div>
-                    <div class="flex flex-wrap gap-4 mb-4">
-                        ${optionsHtml}
-                    </div>
+                <div class="bg-white/40 backdrop-blur-md p-6 rounded-2xl border border-white/60 shadow-sm">
+                    <div class="mb-4 text-xs font-black text-slate-500 uppercase tracking-widest bg-white/60 border border-white px-3 py-1 rounded inline-block">Category: ${odd.topic}</div>
+                    <div class="flex flex-wrap gap-4 mb-4">${optionsHtml}</div>
                     <div id="odd-feedback-${idx}" class="p-4 rounded-xl text-sm font-medium hidden shadow-inner"></div>
                 </div>
             `;
@@ -846,16 +815,12 @@
         function selectOdd(qIdx, selectedOpt, btnIdx) {
             const odd = oddOneOutData[qIdx];
             const feedback = document.getElementById(`odd-feedback-${qIdx}`);
-            
-            // Disable all buttons in this row
             odd.options.forEach((_, oIdx) => {
                 const btn = document.getElementById(`btn-odd-${qIdx}-${oIdx}`);
-                btn.disabled = true;
-                btn.classList.add('opacity-70');
+                btn.disabled = true; btn.classList.add('opacity-50');
             });
-
             const activeBtn = document.getElementById(`btn-odd-${qIdx}-${btnIdx}`);
-            activeBtn.classList.remove('opacity-70');
+            activeBtn.classList.remove('opacity-50');
             feedback.classList.remove('hidden');
 
             if (selectedOpt === odd.wrong) {
@@ -864,20 +829,135 @@
                 feedback.innerHTML = `<strong>Correct!</strong> ${odd.reason}`;
             } else {
                 activeBtn.className = "px-5 py-3 rounded-xl font-bold border-2 shadow-sm transition-all btn-wrong";
-                // Reveal the correct one
                 const correctIdx = odd.options.indexOf(odd.wrong);
-                document.getElementById(`btn-odd-${qIdx}-${correctIdx}`).className = "px-5 py-3 rounded-xl font-bold border-2 border-emerald-500 bg-white text-emerald-700 shadow-sm transition-all";
-                
+                document.getElementById(`btn-odd-${qIdx}-${correctIdx}`).className = "px-5 py-3 rounded-xl font-bold border-2 border-emerald-500 bg-emerald-50 text-emerald-800 shadow-sm transition-all opacity-100";
                 feedback.className = "p-4 rounded-xl text-sm font-medium shadow-inner bg-rose-50 border border-rose-200 text-rose-800 fade-in";
                 feedback.innerHTML = `<strong>Incorrect.</strong> The odd one out was '${odd.wrong}'. ${odd.reason}`;
             }
         }
 
+
         /* =========================================================
            GAMES SECTION LOGIC
            ========================================================= */
 
-        // --- GAME 1: SENTENCE MAKER ---
+        // --- GAME 1: VOCAB CLASH ---
+        const clashWords = ["Plummet", "Surge", "Plateau", "Fluctuate", "Steadily", "Significantly", "Gradual", "Dramatic", "Fractional", "Soar", "Wildly", "Decline"];
+        let scoreA = 0; let scoreB = 0;
+        
+        function changeScore(team, amount) {
+            if(team === 'A') { scoreA += amount; document.getElementById('score-a').innerText = scoreA; }
+            if(team === 'B') { scoreB += amount; document.getElementById('score-b').innerText = scoreB; }
+        }
+
+        function drawClashWords() {
+            const shuffled = [...clashWords].sort(() => Math.random() - 0.5);
+            const w1 = document.getElementById('clash-word-1');
+            const w2 = document.getElementById('clash-word-2');
+            
+            // Animation reset
+            w1.style.animation = 'none'; w2.style.animation = 'none';
+            w1.offsetHeight; /* trigger reflow */
+            w1.style.animation = 'fadeIn 0.5s'; w2.style.animation = 'fadeIn 0.5s';
+            
+            w1.innerText = shuffled[0];
+            w2.innerText = shuffled[1];
+        }
+
+        // --- GAME 2: VOCAB MILLIONAIRE ---
+        const milQuestions = [
+            { q: "Which word means to go down very quickly?", opts: ["Surge", "Plummet", "Peak", "Climb"], ans: 1 },
+            { q: "What is the adverb form of 'Dramatic'?", opts: ["Dramatically", "Dramatics", "Dramatize", "Drama"], ans: 0 },
+            { q: "Prices reached a ____ of $50.", opts: ["Plateau", "Fluctuation", "Peak", "Bottom"], ans: 2 },
+            { q: "Which phrase describes a period of no change?", opts: ["Remained volatile", "Levelled off", "Dipped slightly", "Plunged"], ans: 1 },
+            { q: "There was a ____ increase in sales. (Adjective)", opts: ["Significantly", "Steadily", "Gradual", "Rapidly"], ans: 2 },
+            { q: "What is the opposite of 'Soar'?", opts: ["Rocket", "Plunge", "Surge", "Climb"], ans: 1 },
+            { q: "The data ____ wildly throughout the year.", opts: ["Steadied", "Plateaued", "Fluctuated", "Bottomed"], ans: 2 },
+            { q: "Which word indicates a very small change?", opts: ["Enormous", "Substantial", "Steep", "Fractional"], ans: 3 },
+            { q: "The percentage ____ out at 5%.", opts: ["Peaked", "Bottomed", "Levelled", "Reached"], ans: 1 },
+            { q: "Which preposition is correct: Sales increased ____ 10% to 20%.", opts: ["by", "from", "at", "of"], ans: 1 },
+            { q: "Which phrase implies a temporary fall before a recovery?", opts: ["Plummeted", "Crashed", "Dipped slightly", "Rose sharply"], ans: 2 },
+            { q: "Choose the correct noun phrase:", opts: ["A wildly fluctuate", "A steep climb", "A steadily growth", "A dramatic fell"], ans: 1 },
+            { q: "The proportion stood ____ 25%.", opts: ["at", "on", "in", "by"], ans: 0 },
+            { q: "Which of the following is NOT an adjective?", opts: ["Rapid", "Steep", "Gradually", "Substantial"], ans: 2 },
+            { q: "What is a synonym for 'Plateau'?", opts: ["Hit a low", "Surge", "Remain steady", "Fluctuate"], ans: 2 }
+        ];
+
+        const prizes = ["£100", "£200", "£300", "£500", "£1,000", "£2,000", "£4,000", "£8,000", "£16,000", "£32,000", "£64,000", "£125,000", "£250,000", "£500,000", "£1 MILLION"];
+        let milCurrentQ = 0;
+
+        function renderLadder() {
+            const ladder = document.getElementById('mil-ladder');
+            ladder.innerHTML = prizes.map((p, i) => {
+                let cls = "ladder-step px-3 py-1 text-slate-400";
+                if (i === milCurrentQ) cls = "ladder-step active px-3 py-1";
+                if (i < milCurrentQ) cls = "ladder-step safe px-3 py-1";
+                return `<div class="${cls}"><span>${i+1}</span> <span class="float-right">${p}</span></div>`;
+            }).join('');
+        }
+
+        function startMillionaire() {
+            milCurrentQ = 0;
+            document.getElementById('mil-start-screen').classList.add('hidden');
+            document.getElementById('mil-end-screen').classList.add('hidden');
+            document.getElementById('mil-game-screen').classList.remove('hidden');
+            loadMilQuestion();
+            renderLadder();
+        }
+
+        function loadMilQuestion() {
+            const q = milQuestions[milCurrentQ];
+            document.getElementById('mil-question').innerText = q.q;
+            const optsContainer = document.getElementById('mil-options');
+            optsContainer.innerHTML = q.opts.map((opt, i) => {
+                const letter = String.fromCharCode(65 + i);
+                return `<button id="mil-btn-${i}" onclick="checkMilAnswer(${i})" class="mil-btn w-full text-left px-6 py-4 rounded-full font-bold shadow-lg flex items-center group">
+                            <span class="text-amber-400 mr-3 group-hover:text-amber-300">${letter}:</span> ${opt}
+                        </button>`;
+            }).join('');
+            renderLadder();
+        }
+
+        function checkMilAnswer(selectedIdx) {
+            const correctIdx = milQuestions[milCurrentQ].ans;
+            const btns = document.querySelectorAll('.mil-btn');
+            btns.forEach(b => { b.disabled = true; b.classList.add('opacity-80'); });
+            
+            if (selectedIdx === correctIdx) {
+                document.getElementById(`mil-btn-${selectedIdx}`).classList.add('correct');
+                document.getElementById(`mil-btn-${selectedIdx}`).classList.remove('opacity-80');
+                setTimeout(() => {
+                    milCurrentQ++;
+                    if (milCurrentQ < milQuestions.length) { loadMilQuestion(); } 
+                    else { endGame(true); }
+                }, 1500);
+            } else {
+                document.getElementById(`mil-btn-${selectedIdx}`).classList.add('wrong');
+                document.getElementById(`mil-btn-${correctIdx}`).classList.add('correct');
+                document.getElementById(`mil-btn-${selectedIdx}`).classList.remove('opacity-80');
+                document.getElementById(`mil-btn-${correctIdx}`).classList.remove('opacity-80');
+                setTimeout(() => endGame(false), 2000);
+            }
+        }
+
+        function endGame(won) {
+            document.getElementById('mil-game-screen').classList.add('hidden');
+            const endScreen = document.getElementById('mil-end-screen');
+            endScreen.classList.remove('hidden');
+            
+            if (won) {
+                document.getElementById('mil-end-msg').innerText = "🏆 YOU ARE A VOCAB MILLIONAIRE! 🏆";
+                document.getElementById('mil-end-msg').className = "text-4xl font-black text-amber-400 mb-4 fade-in";
+                document.getElementById('mil-end-prize').innerText = prizes[prizes.length - 1];
+            } else {
+                document.getElementById('mil-end-msg').innerText = "Game Over!";
+                document.getElementById('mil-end-msg').className = "text-4xl font-black text-rose-500 mb-4 fade-in";
+                const prize = milCurrentQ > 0 ? prizes[milCurrentQ - 1] : "£0";
+                document.getElementById('mil-end-prize').innerText = prize;
+            }
+        }
+
+        // --- GAME 3: SENTENCE MAKER ---
         const smLevels = [
             { words: ["surge", "There", "in", "the", "number", "tourists.", "was", "a", "dramatic", "of"], correct: "There was a dramatic surge in the number of tourists." },
             { words: ["fluctuated", "The", "wildly", "throughout", "the", "price", "of", "oil", "period."], correct: "The price of oil fluctuated wildly throughout the period." },
@@ -889,174 +969,94 @@
         let smPool = [];
         let smAnswer = [];
 
-        const smPoolEl = document.getElementById('sm-word-pool');
-        const smAnswerEl = document.getElementById('sm-answer-box');
-        const smStatusEl = document.getElementById('sm-status');
-        const smNextBtn = document.getElementById('sm-next-btn');
-        const smLevelEl = document.getElementById('sm-level');
-
         function initSentenceMaker() {
             smPool = [...smLevels[smCurrentLevel].words].sort(() => Math.random() - 0.5);
             smAnswer = [];
-            smStatusEl.classList.add('hidden');
-            smNextBtn.classList.add('hidden');
-            smLevelEl.innerText = smCurrentLevel + 1;
+            document.getElementById('sm-status').classList.add('hidden');
+            document.getElementById('sm-next-btn').classList.add('hidden');
+            document.getElementById('sm-level').innerText = smCurrentLevel + 1;
             renderSentenceMaker();
         }
 
         function renderSentenceMaker() {
-            smPoolEl.innerHTML = smPool.map((word, idx) => 
-                `<button onclick="smMoveToAnswer(${idx})" class="sm-word bg-white text-indigo-900 font-bold px-4 py-2 rounded-lg shadow border border-indigo-200 hover:bg-indigo-50">${word}</button>`
-            ).join('');
-
-            smAnswerEl.innerHTML = smAnswer.length === 0 
-                ? `<span class="text-indigo-300/50 italic">Click words from the pool below to build your sentence...</span>`
-                : smAnswer.map((word, idx) => 
-                    `<button onclick="smMoveToPool(${idx})" class="sm-word bg-indigo-500 text-white font-bold px-4 py-2 rounded-lg shadow-sm border border-indigo-400 hover:bg-indigo-400">${word}</button>`
-                  ).join('');
+            document.getElementById('sm-word-pool').innerHTML = smPool.map((word, idx) => `<button onclick="smMoveToAnswer(${idx})" class="sm-word bg-white text-indigo-900 font-bold px-4 py-2 rounded-lg shadow-sm border border-slate-200 hover:bg-indigo-50">${word}</button>`).join('');
+            document.getElementById('sm-answer-box').innerHTML = smAnswer.length === 0 ? `<span class="text-slate-400 italic mt-2 ml-2">Click words below to build...</span>` : smAnswer.map((word, idx) => `<button onclick="smMoveToPool(${idx})" class="sm-word bg-indigo-600 text-white font-bold px-4 py-2 rounded-lg shadow-md border border-indigo-500 hover:bg-indigo-500">${word}</button>`).join('');
         }
 
-        function smMoveToAnswer(idx) {
-            smAnswer.push(smPool[idx]);
-            smPool.splice(idx, 1);
-            renderSentenceMaker();
-        }
-
-        function smMoveToPool(idx) {
-            smPool.push(smAnswer[idx]);
-            smAnswer.splice(idx, 1);
-            renderSentenceMaker();
-        }
+        function smMoveToAnswer(idx) { smAnswer.push(smPool[idx]); smPool.splice(idx, 1); renderSentenceMaker(); }
+        function smMoveToPool(idx) { smPool.push(smAnswer[idx]); smAnswer.splice(idx, 1); renderSentenceMaker(); }
 
         function checkSentenceMaker() {
             const currentStr = smAnswer.join(' ');
+            const statusEl = document.getElementById('sm-status');
+            const nextBtn = document.getElementById('sm-next-btn');
+            statusEl.classList.remove('hidden');
+            
             if (currentStr === smLevels[smCurrentLevel].correct) {
-                smStatusEl.classList.remove('hidden');
-                smStatusEl.innerHTML = "✓ Perfect Sentence!";
-                smStatusEl.className = "font-bold text-emerald-400 fade-in";
-                
-                if (smCurrentLevel < smLevels.length - 1) {
-                    smNextBtn.classList.remove('hidden');
-                } else {
-                    smNextBtn.classList.remove('hidden');
-                    smNextBtn.innerText = "Restart Game";
-                    smNextBtn.onclick = () => { smCurrentLevel = 0; initSentenceMaker(); smNextBtn.innerText = "Next Level ➔"; smNextBtn.onclick = nextSentence; };
-                }
+                statusEl.innerHTML = "✓ Perfect Sentence!";
+                statusEl.className = "font-bold text-emerald-600 bg-emerald-50 px-3 py-1 rounded-lg border border-emerald-200 fade-in";
+                nextBtn.classList.remove('hidden');
+                if (smCurrentLevel === smLevels.length - 1) { nextBtn.innerText = "Restart Game"; nextBtn.onclick = () => { smCurrentLevel = 0; initSentenceMaker(); nextBtn.innerText = "Next Level ➔"; nextBtn.onclick = nextSentence; }; }
             } else {
-                smStatusEl.classList.remove('hidden');
-                smStatusEl.innerHTML = "✗ Incorrect structure. Keep trying!";
-                smStatusEl.className = "font-bold text-rose-400 fade-in";
+                statusEl.innerHTML = "✗ Incorrect structure.";
+                statusEl.className = "font-bold text-rose-600 bg-rose-50 px-3 py-1 rounded-lg border border-rose-200 fade-in";
             }
         }
-
-        function nextSentence() {
-            smCurrentLevel++;
-            initSentenceMaker();
-        }
-
+        function nextSentence() { smCurrentLevel++; initSentenceMaker(); }
         initSentenceMaker();
 
 
-        // --- GAME 2: MEMORY MATCH ---
-        const memoryPairsData = [
-            { a: "Plummet", b: "Fall sharply", id: 1 },
-            { a: "Soar", b: "Rise dramatically", id: 2 },
-            { a: "Plateau", b: "Level off", id: 3 },
-            { a: "Fluctuate", b: "Oscillate", id: 4 },
-            { a: "Tiny fraction", b: "Very small part", id: 5 },
-            { a: "Vast majority", b: "Almost all", id: 6 }
-        ];
-
-        let memCards = [];
-        let memFlippedIndices = [];
-        let memMatchedIds = [];
-        let memMoves = 0;
-        let memLockBoard = false;
+        // --- GAME 4: MEMORY MATCH ---
+        const memoryPairsData = [{ a: "Plummet", b: "Fall sharply", id: 1 }, { a: "Soar", b: "Rise dramatically", id: 2 }, { a: "Plateau", b: "Level off", id: 3 }, { a: "Fluctuate", b: "Oscillate", id: 4 }, { a: "Tiny fraction", b: "Very small part", id: 5 }, { a: "Vast majority", b: "Almost all", id: 6 }];
+        let memCards = []; let memFlippedIndices = []; let memMatchedIds = []; let memMoves = 0; let memLockBoard = false;
 
         function initMemoryGame() {
-            const board = document.getElementById('memory-board');
             document.getElementById('memory-moves').innerText = "0";
             document.getElementById('memory-win').classList.add('hidden');
-            memMoves = 0;
-            memFlippedIndices = [];
-            memMatchedIds = [];
-            memLockBoard = false;
-
-            // Generate deck
+            memMoves = 0; memFlippedIndices = []; memMatchedIds = []; memLockBoard = false;
             memCards = [];
-            memoryPairsData.forEach(pair => {
-                memCards.push({ text: pair.a, id: pair.id });
-                memCards.push({ text: pair.b, id: pair.id });
-            });
-            // Shuffle
+            memoryPairsData.forEach(pair => { memCards.push({ text: pair.a, id: pair.id }); memCards.push({ text: pair.b, id: pair.id }); });
             memCards.sort(() => Math.random() - 0.5);
-
             renderMemoryBoard();
         }
 
         function renderMemoryBoard() {
-            const board = document.getElementById('memory-board');
-            board.innerHTML = memCards.map((card, idx) => {
+            document.getElementById('memory-board').innerHTML = memCards.map((card, idx) => {
                 const isFlipped = memFlippedIndices.includes(idx) || memMatchedIds.includes(card.id);
                 const isMatched = memMatchedIds.includes(card.id);
-                return `
-                    <div class="memory-card ${isFlipped ? 'flipped' : ''} ${isMatched ? 'matched' : ''}" onclick="flipMemCard(${idx})">
-                        <div class="memory-card-inner">
-                            <div class="memory-card-front">?</div>
-                            <div class="memory-card-back">${card.text}</div>
-                        </div>
-                    </div>
-                `;
+                return `<div class="memory-card ${isFlipped ? 'flipped' : ''} ${isMatched ? 'matched' : ''}" onclick="flipMemCard(${idx})"><div class="memory-card-inner"><div class="memory-card-front">?</div><div class="memory-card-back">${card.text}</div></div></div>`;
             }).join('');
         }
 
         function flipMemCard(idx) {
-            if (memLockBoard) return;
-            if (memFlippedIndices.includes(idx)) return;
-            if (memMatchedIds.includes(memCards[idx].id)) return;
-
+            if (memLockBoard || memFlippedIndices.includes(idx) || memMatchedIds.includes(memCards[idx].id)) return;
             memFlippedIndices.push(idx);
             renderMemoryBoard();
-
             if (memFlippedIndices.length === 2) {
-                memLockBoard = true;
-                memMoves++;
+                memLockBoard = true; memMoves++;
                 document.getElementById('memory-moves').innerText = memMoves;
                 checkMemMatch();
             }
         }
 
         function checkMemMatch() {
-            const idx1 = memFlippedIndices[0];
-            const idx2 = memFlippedIndices[1];
-            
+            const [idx1, idx2] = memFlippedIndices;
             if (memCards[idx1].id === memCards[idx2].id) {
                 memMatchedIds.push(memCards[idx1].id);
-                memFlippedIndices = [];
-                memLockBoard = false;
+                memFlippedIndices = []; memLockBoard = false;
                 renderMemoryBoard();
-                
-                if (memMatchedIds.length === memoryPairsData.length) {
-                    document.getElementById('memory-win').classList.remove('hidden');
-                }
+                if (memMatchedIds.length === memoryPairsData.length) document.getElementById('memory-win').classList.remove('hidden');
             } else {
-                setTimeout(() => {
-                    memFlippedIndices = [];
-                    memLockBoard = false;
-                    renderMemoryBoard();
-                }, 1000);
+                setTimeout(() => { memFlippedIndices = []; memLockBoard = false; renderMemoryBoard(); }, 1000);
             }
         }
-
         initMemoryGame();
 
 
-        // --- GAME 3: SPEED GAP FILL ---
+        // --- GAME 5: SPEED GAP FILL ---
         const gfTemplate = "Between 2000 and 2010, the population {0} a {1} surge. However, in 2011, it {2} a peak of 5 million before it {3} to 2 million. Finally, the figures {4} off at the end of the period.";
         const gfAnswers = ["experienced", "dramatic", "hit", "plummeted", "levelled"];
-        
-        let gfBankWords = [];
-        let gfBlanks = ["", "", "", "", ""];
+        let gfBankWords = []; let gfBlanks = ["", "", "", "", ""];
 
         function initGapFill() {
             gfBankWords = [...gfAnswers].sort(() => Math.random() - 0.5);
@@ -1066,67 +1066,32 @@
         }
 
         function renderGapFill() {
-            // Render Bank
-            const bankEl = document.getElementById('gf-bank');
-            bankEl.innerHTML = gfBankWords.length === 0 
-                ? `<span class="text-slate-400 italic">All words used. Submit report.</span>` 
-                : gfBankWords.map((w, idx) => `<button onclick="gfMoveToBlank(${idx})" class="bg-white border-2 border-indigo-200 text-indigo-700 font-bold px-4 py-2 rounded-lg shadow-sm hover:border-indigo-400 hover:bg-indigo-50 transition-colors">${w}</button>`).join('');
-
-            // Render Text
+            document.getElementById('gf-bank').innerHTML = gfBankWords.length === 0 ? `<span class="text-slate-400 italic">All words used. Submit report.</span>` : gfBankWords.map((w, idx) => `<button onclick="gfMoveToBlank(${idx})" class="bg-white border border-slate-300 text-emerald-700 font-bold px-4 py-2 rounded-lg shadow-sm hover:border-emerald-400 hover:bg-emerald-50 transition-colors">${w}</button>`).join('');
             let htmlText = gfTemplate;
-            gfBlanks.forEach((bVal, bIdx) => {
-                const blankHtml = bVal === "" 
-                    ? `<span class="gap-fill-blank"></span>` 
-                    : `<span class="gap-fill-blank filled" onclick="gfMoveToBank(${bIdx})">${bVal}</span>`;
-                htmlText = htmlText.replace(`{${bIdx}}`, blankHtml);
-            });
+            gfBlanks.forEach((bVal, bIdx) => { htmlText = htmlText.replace(`{${bIdx}}`, bVal === "" ? `<span class="gap-fill-blank"></span>` : `<span class="gap-fill-blank filled" onclick="gfMoveToBank(${bIdx})">${bVal}</span>`); });
             document.getElementById('gf-paragraph').innerHTML = htmlText;
         }
 
         function gfMoveToBlank(bankIdx) {
-            // Find first empty blank
             const firstEmpty = gfBlanks.findIndex(b => b === "");
-            if (firstEmpty !== -1) {
-                gfBlanks[firstEmpty] = gfBankWords[bankIdx];
-                gfBankWords.splice(bankIdx, 1);
-                renderGapFill();
-            }
+            if (firstEmpty !== -1) { gfBlanks[firstEmpty] = gfBankWords[bankIdx]; gfBankWords.splice(bankIdx, 1); renderGapFill(); }
         }
 
-        function gfMoveToBank(blankIdx) {
-            gfBankWords.push(gfBlanks[blankIdx]);
-            gfBlanks[blankIdx] = "";
-            renderGapFill();
-        }
+        function gfMoveToBank(blankIdx) { gfBankWords.push(gfBlanks[blankIdx]); gfBlanks[blankIdx] = ""; renderGapFill(); }
 
         function checkGapFill() {
             const feedback = document.getElementById('gf-feedback');
             feedback.classList.remove('hidden');
-
-            if (gfBlanks.includes("")) {
-                feedback.className = "mt-6 text-center font-bold text-lg text-amber-600 fade-in";
-                feedback.innerHTML = "⚠️ Please fill all the blanks first.";
-                return;
-            }
-
-            let isPerfect = true;
-            gfBlanks.forEach((val, idx) => {
-                if (val !== gfAnswers[idx]) isPerfect = false;
-            });
-
+            if (gfBlanks.includes("")) { feedback.className = "mt-6 text-center font-bold text-lg text-amber-600 bg-amber-50 p-3 rounded-xl border border-amber-200 fade-in"; feedback.innerHTML = "⚠️ Please fill all the blanks first."; return; }
+            const isPerfect = gfBlanks.every((val, idx) => val === gfAnswers[idx]);
             if (isPerfect) {
-                feedback.className = "mt-6 text-center font-bold text-lg text-emerald-600 fade-in";
+                feedback.className = "mt-6 text-center font-bold text-lg text-emerald-600 bg-emerald-50 p-3 rounded-xl border border-emerald-200 fade-in";
                 feedback.innerHTML = "🎉 Perfect Academic Report!";
             } else {
-                feedback.className = "mt-6 text-center font-bold text-lg text-rose-600 fade-in";
-                feedback.innerHTML = "✗ Some words are in the wrong place. Click a word in the text to return it to the bank and try again.";
+                feedback.className = "mt-6 text-center font-bold text-lg text-rose-600 bg-rose-50 p-3 rounded-xl border border-rose-200 fade-in";
+                feedback.innerHTML = "✗ Some words are in the wrong place. Click a word in the text to return it to the bank.";
             }
         }
-
-        function resetGapFill() {
-            initGapFill();
-        }
-
         initGapFill();
 
     </script>
