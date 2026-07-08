@@ -274,58 +274,65 @@
             <h1 class="text-4xl md:text-5xl font-lora font-black text-center text-indigo-900 mb-2 drop-shadow-lg">Interactive Game Zone</h1>
             <p class="text-center text-indigo-800 font-bold mb-12 bg-white/40 backdrop-blur-md px-6 py-2 rounded-full w-fit mx-auto border border-white/60">Put your vocabulary to the ultimate test.</p>
 
-            <!-- GAME 1: VOCAB CLASH (Designer Clash Inspired) -->
-            <section class="liquid-card mb-12 !p-0">
-                <div class="content-z">
-                    <div class="bg-slate-900 text-white p-6 border-b border-slate-700">
-                        <h2 class="text-3xl font-bold flex items-center text-white">
-                            <svg class="w-8 h-8 mr-3 text-rose-500" fill="currentColor" viewBox="0 0 24 24"><path d="M11 2L2 22h8l2-8h8l-2-12H11zm3 10h-4l1-4h4l-1 4z"></path></svg>
-                            Game 1: Vocab Clash
-                        </h2>
-                        <p class="text-slate-400 mt-2">Team vs Team. Create a grammatically perfect sentence including BOTH words shown on the screen.</p>
-                    </div>
-                    
-                    <div class="p-8">
-                        <div class="flex flex-col md:flex-row justify-between items-stretch bg-white/60 backdrop-blur-md p-6 rounded-3xl border border-white shadow-inner gap-8">
-                            <!-- Team A -->
-                            <div class="text-center flex flex-col items-center justify-center bg-white/80 p-6 rounded-2xl border-2 border-rose-200 shadow-sm w-full md:w-48">
-                                <h3 class="text-rose-600 font-black text-2xl tracking-widest uppercase">Team A</h3>
-                                <div class="text-6xl font-black text-slate-800 my-6 drop-shadow-md" id="score-a">0</div>
-                                <div class="flex gap-2 w-full">
-                                    <button onclick="changeScore('A', -1)" class="bg-rose-100 hover:bg-rose-200 text-rose-700 font-black text-xl py-2 flex-1 rounded-xl transition">-</button>
-                                    <button onclick="changeScore('A', 1)" class="bg-rose-500 hover:bg-rose-600 text-white font-black text-xl py-2 flex-1 rounded-xl transition shadow-md">+</button>
-                                </div>
-                            </div>
+                 // --- GAME 1: VOCAB CLASH (Teacher reveals full sentence) ---
+        const clashPairs = [
+            { w1: "Plummet", w2: "Surge", sentence: "After shares <span class='clash-highlight'>plummeted</span> in March, demand for tech stocks <span class='clash-highlight'>surged</span> unexpectedly in April." },
+            { w1: "Plateau", w2: "Fluctuate", sentence: "The prices <span class='clash-highlight'>fluctuated</span> for months before they finally <span class='clash-highlight'>plateaued</span> at a reasonable level." },
+            { w1: "Steadily", w2: "Significantly", sentence: "The population grew <span class='clash-highlight'>steadily</span> over the decade and <span class='clash-highlight'>significantly</span> boosted the local economy." },
+            { w1: "Gradual", w2: "Dramatic", sentence: "Although the <span class='clash-highlight'>gradual</span> rise was expected, the <span class='clash-highlight'>dramatic</span> fall in December surprised analysts." },
+            { w1: "Fractional", w2: "Soar", sentence: "Despite a <span class='clash-highlight'>fractional</span> drop in spring, profits began to <span class='clash-highlight'>soar</span> by midsummer." },
+            { w1: "Wildly", w2: "Decline", sentence: "Sales fluctuated <span class='clash-highlight'>wildly</span> before they began to <span class='clash-highlight'>decline</span> steeply toward year-end." },
+            { w1: "Surge", w2: "Decline", sentence: "After a brief <span class='clash-highlight'>surge</span> in February, the figures went into a steady <span class='clash-highlight'>decline</span>." },
+            { w1: "Soar", w2: "Plummet", sentence: "While tourism <span class='clash-highlight'>soared</span> during summer, it <span class='clash-highlight'>plummeted</span> sharply in the off-season." },
+            { w1: "Plateau", w2: "Soar", sentence: "Once the figures <span class='clash-highlight'>plateaued</span> in May, no one expected them to <span class='clash-highlight'>soar</span> again by August." },
+            { w1: "Dramatic", w2: "Fluctuate", sentence: "The <span class='clash-highlight'>dramatic</span> changes caused prices to <span class='clash-highlight'>fluctuate</span> throughout the entire quarter." },
+            { w1: "Significantly", w2: "Plateau", sentence: "Although output increased <span class='clash-highlight'>significantly</span>, it eventually <span class='clash-highlight'>plateaued</span> at 4,000 units." },
+            { w1: "Gradual", w2: "Plummet", sentence: "Following a <span class='clash-highlight'>gradual</span> improvement, sales unexpectedly <span class='clash-highlight'>plummeted</span> in the final quarter." }
+        ];
 
-                            <!-- Center Clash Arena -->
-                            <div class="text-center flex-1 flex flex-col justify-center items-center">
-                                <div class="bg-slate-900 p-8 rounded-3xl border-4 border-indigo-400 shadow-2xl w-full relative overflow-hidden">
-                                    <div class="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
-                                    <h4 class="text-indigo-300 font-bold mb-6 uppercase tracking-widest relative z-10 text-sm">Target Words</h4>
-                                    
-                                    <div class="text-4xl md:text-5xl font-black text-white mb-4 relative z-10 drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]" id="clash-word-1">Ready?</div>
-                                    <div class="bg-indigo-600 text-white text-xs font-black px-3 py-1 rounded-full w-fit mx-auto my-4 relative z-10 border border-indigo-400">AND</div>
-                                    <div class="text-4xl md:text-5xl font-black text-white relative z-10 drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]" id="clash-word-2">Click Draw</div>
-                                </div>
-                                <button onclick="drawClashWords()" class="mt-8 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-black text-lg py-4 px-12 rounded-2xl shadow-[0_10px_20px_rgba(79,70,229,0.4)] transition-all transform hover:-translate-y-1 hover:scale-105 border border-indigo-400">
-                                    DRAW WORDS ⚔️
-                                </button>
-                            </div>
+        let scoreA = 0; let scoreB = 0;
+        let currentClashPair = null;
+        
+        function changeScore(team, amount) {
+            if(team === 'A') { scoreA += amount; document.getElementById('score-a').innerText = scoreA; }
+            if(team === 'B') { scoreB += amount; document.getElementById('score-b').innerText = scoreB; }
+        }
 
-                            <!-- Team B -->
-                            <div class="text-center flex flex-col items-center justify-center bg-white/80 p-6 rounded-2xl border-2 border-sky-200 shadow-sm w-full md:w-48">
-                                <h3 class="text-sky-600 font-black text-2xl tracking-widest uppercase">Team B</h3>
-                                <div class="text-6xl font-black text-slate-800 my-6 drop-shadow-md" id="score-b">0</div>
-                                <div class="flex gap-2 w-full">
-                                    <button onclick="changeScore('B', -1)" class="bg-sky-100 hover:bg-sky-200 text-sky-700 font-black text-xl py-2 flex-1 rounded-xl transition">-</button>
-                                    <button onclick="changeScore('B', 1)" class="bg-sky-500 hover:bg-sky-600 text-white font-black text-xl py-2 flex-1 rounded-xl transition shadow-md">+</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
+        function drawClashWords() {
+            currentClashPair = clashPairs[Math.floor(Math.random() * clashPairs.length)];
+            
+            const w1 = document.getElementById('clash-word-1');
+            const w2 = document.getElementById('clash-word-2');
+            
+            w1.style.animation = 'none'; w2.style.animation = 'none';
+            w1.offsetHeight;
+            w1.style.animation = 'fadeIn 0.5s'; w2.style.animation = 'fadeIn 0.5s';
+            
+            w1.innerText = currentClashPair.w1;
+            w2.innerText = currentClashPair.w2;
 
+            // Setup the example sentence area, but keep it fully hidden until teacher toggles
+            document.getElementById('clash-sentence-container').innerHTML = currentClashPair.sentence;
+            document.getElementById('clash-sentence-container').classList.add('hidden');
+            document.getElementById('clash-toggle-btn').innerText = "👁 Reveal Sentence";
+            document.getElementById('clash-example-section').classList.remove('hidden');
+        }
+
+        function toggleClashExample() {
+            if (!currentClashPair) return;
+            
+            const container = document.getElementById('clash-sentence-container');
+            const btn = document.getElementById('clash-toggle-btn');
+            
+            if (container.classList.contains('hidden')) {
+                container.classList.remove('hidden');
+                container.classList.add('fade-in');
+                btn.innerText = "🙈 Hide Sentence";
+            } else {
+                container.classList.add('hidden');
+                btn.innerText = "👁 Reveal Sentence";
+            }
+        }
             <!-- GAME 2: VOCAB MILLIONAIRE -->
             <section class="liquid-card mb-12 !p-0">
                 <div class="content-z">
