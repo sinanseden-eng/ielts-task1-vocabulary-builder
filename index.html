@@ -1,0 +1,1134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IELTS Task 1 Vocabulary Expansion Lab</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&family=Lora:wght@500;700;italic&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8fafc;
+            font-family: 'Inter', sans-serif;
+            color: #1e293b;
+            scroll-behavior: smooth;
+        }
+        .font-lora { font-family: 'Lora', serif; }
+
+        /* Card Flip Styles for Quizlet & Memory Effect */
+        .perspective-1000 { perspective: 1000px; }
+        .transform-style-3d { transform-style: preserve-3d; }
+        .backface-hidden { backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+        .rotate-y-180 { transform: rotateY(180deg); }
+
+        /* Input highlight states */
+        .input-correct { background-color: #dcfce7; border-color: #10b981; color: #065f46; }
+        .input-incorrect { background-color: #fee2e2; border-color: #ef4444; color: #991b1b; }
+        
+        .fade-in { animation: fadeIn 0.4s ease-out forwards; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Interactive Element States */
+        .btn-selectable { transition: all 0.2s ease; border: 2px solid #e2e8f0; cursor: pointer; }
+        .btn-selectable:hover { border-color: #cbd5e1; background-color: #f8fafc; transform: translateY(-1px); }
+        .btn-selected { border-color: #6366f1 !important; background-color: #e0e7ff !important; color: #3730a3 !important; font-weight: bold; }
+        .btn-correct { border-color: #10b981 !important; background-color: #dcfce7 !important; color: #065f46 !important; opacity: 0.8; pointer-events: none; }
+        .btn-wrong { border-color: #ef4444 !important; background-color: #fee2e2 !important; color: #991b1b !important; animation: shake 0.4s; }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-4px); }
+            50% { transform: translateX(4px); }
+            75% { transform: translateX(-4px); }
+        }
+
+        /* Game Specifics */
+        .memory-card { height: 100px; cursor: pointer; perspective: 1000px; }
+        .memory-card-inner { width: 100%; height: 100%; transition: transform 0.6s; transform-style: preserve-3d; position: relative; }
+        .memory-card.flipped .memory-card-inner { transform: rotateY(180deg); }
+        .memory-card-front, .memory-card-back { width: 100%; height: 100%; position: absolute; backface-visibility: hidden; border-radius: 12px; display: flex; align-items: center; justify-content: center; padding: 8px; text-align: center; font-weight: bold; }
+        .memory-card-front { background: #4f46e5; color: white; border: 2px solid #3730a3; font-size: 2rem; }
+        .memory-card-back { background: white; color: #1e293b; border: 2px solid #e2e8f0; transform: rotateY(180deg); font-size: 0.9rem; }
+        .memory-card.matched .memory-card-back { background: #dcfce7; border-color: #10b981; color: #065f46; }
+
+        .sm-word { cursor: pointer; transition: transform 0.1s; }
+        .sm-word:active { transform: scale(0.95); }
+        
+        .gap-fill-blank { display: inline-block; min-width: 80px; height: 28px; border-bottom: 2px solid #94a3b8; margin: 0 4px; text-align: center; font-weight: bold; color: #4f46e5; cursor: pointer; vertical-align: bottom;}
+        .gap-fill-blank.filled { border-bottom-color: #4f46e5; }
+    </style>
+</head>
+<body class="pb-20">
+
+    <!-- Premium Header -->
+    <div class="bg-indigo-900 text-white pt-16 pb-12 px-4 shadow-lg text-center relative overflow-hidden">
+        <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(#fff 1px, transparent 1px); background-size: 20px 20px;"></div>
+        <h1 class="text-4xl md:text-5xl font-lora font-bold mb-4 relative z-10">IELTS Task 1 Vocabulary Builder</h1>
+        <p class="text-lg text-indigo-200 max-w-2xl mx-auto font-medium relative z-10">Master the essential academic trends, collocations, and word families required for a Band 7+ score, completely adapted from Cambridge standards.</p>
+        
+        <!-- Jump Menu -->
+        <div class="mt-8 flex flex-wrap justify-center gap-3 relative z-10">
+            <a href="#flashcards" class="bg-white/10 hover:bg-white/20 px-4 py-2 rounded-full text-sm font-semibold transition">Flashcards</a>
+            <a href="#rewrites" class="bg-white/10 hover:bg-white/20 px-4 py-2 rounded-full text-sm font-semibold transition">Rewrites</a>
+            <a href="#collocations" class="bg-white/10 hover:bg-white/20 px-4 py-2 rounded-full text-sm font-semibold transition">Collocations</a>
+            <a href="#wordwebs" class="bg-white/10 hover:bg-white/20 px-4 py-2 rounded-full text-sm font-semibold transition">Word Webs</a>
+            <a href="#games" class="bg-indigo-500 hover:bg-indigo-400 px-4 py-2 rounded-full text-sm font-bold transition shadow-md">Play Games</a>
+        </div>
+    </div>
+
+    <div class="max-w-6xl mx-auto px-4 mt-12 space-y-16">
+
+        <!-- ACTIVITY 1: QUIZLET-STYLE FLASHCARDS -->
+        <section id="flashcards" class="bg-white rounded-[2rem] p-8 shadow-xl border border-slate-100">
+            <div class="mb-8 flex flex-col md:flex-row justify-between items-start md:items-center">
+                <div>
+                    <h2 class="text-2xl font-bold text-slate-800 flex items-center">
+                        <svg class="w-6 h-6 mr-3 text-sky-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                        Comprehensive Trends Memory Bank
+                    </h2>
+                    <p class="text-slate-500 mt-1">Includes all definitive verbs, nouns, adverbs, and adjectives for describing data. Click to flip.</p>
+                </div>
+                <div class="bg-slate-100 text-slate-600 font-bold px-4 py-2 rounded-lg mt-4 md:mt-0 shadow-sm border border-slate-200">
+                    Card <span id="card-current">1</span> of <span id="card-total">0</span>
+                </div>
+            </div>
+
+            <div class="flex flex-col items-center">
+                <div id="flashcard-container" class="relative w-full max-w-3xl h-80 cursor-pointer perspective-1000 mb-8" onclick="toggleFlashcard()">
+                    <div id="flashcard-inner" class="w-full h-full relative transition-transform duration-500 transform-style-3d">
+                        <div class="absolute w-full h-full rounded-3xl p-8 flex flex-col items-center justify-center bg-white border-2 border-sky-100 shadow-lg backface-hidden">
+                            <div id="fc-type" class="absolute top-6 right-6 text-xs font-bold text-sky-600 bg-sky-50 px-3 py-1 rounded-full uppercase tracking-wide">Type</div>
+                            <h3 id="fc-word" class="text-5xl md:text-6xl font-black text-slate-800 mb-4 drop-shadow-sm font-lora text-center">Word</h3>
+                            <div class="absolute bottom-6 text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                                Click to Flip
+                            </div>
+                        </div>
+                        <div class="absolute w-full h-full rounded-3xl p-8 flex flex-col items-center justify-center bg-slate-800 border-2 border-slate-700 shadow-xl backface-hidden rotate-y-180 text-center">
+                            <p id="fc-def" class="text-white font-medium text-xl md:text-2xl mb-4 leading-relaxed">"Definition"</p>
+                            <div class="bg-slate-700/50 px-6 py-4 rounded-xl border border-slate-600 w-full max-w-lg mt-4">
+                                <p class="text-xs text-slate-400 uppercase tracking-wider mb-2">Usage / Collocation:</p>
+                                <p id="fc-cols" class="text-lg font-bold text-sky-300">Usage</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex gap-4">
+                    <button onclick="prevCard()" class="bg-white hover:bg-slate-50 text-slate-700 border-2 border-slate-200 p-4 rounded-full shadow-sm transition-transform hover:-translate-x-1">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                    </button>
+                    <button onclick="nextCard()" class="bg-white hover:bg-slate-50 text-slate-700 border-2 border-slate-200 p-4 rounded-full shadow-sm transition-transform hover:translate-x-1">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ACTIVITY 2: REWRITE CHALLENGE -->
+        <section id="rewrites" class="bg-white rounded-[2rem] p-8 shadow-xl border border-slate-100">
+            <h2 class="text-2xl font-bold text-slate-800 mb-2 flex items-center">
+                <svg class="w-6 h-6 mr-3 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
+                Rewrite Challenge: Verb/Adverb ↔ Adjective/Noun
+            </h2>
+            <p class="text-slate-600 mb-8">A key to a Band 7+ is grammatical flexibility. Convert the <strong>verb + adverb</strong> structure in the original sentence into an <strong>adjective + noun</strong> structure.</p>
+            
+            <div id="rewrite-container" class="space-y-6">
+                <!-- Dynamically generated by JS -->
+            </div>
+            
+            <div class="mt-8 flex justify-center">
+                <button onclick="checkRewrites()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-10 rounded-xl shadow-lg transition-colors border border-emerald-500">
+                    Check Answers
+                </button>
+            </div>
+        </section>
+
+        <!-- ACTIVITY 3: VISUAL TREND GUESSER -->
+        <section class="bg-white rounded-[2rem] p-8 shadow-xl border border-slate-100">
+            <h2 class="text-2xl font-bold text-slate-800 mb-2 flex items-center">
+                <svg class="w-6 h-6 mr-3 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                Visual Trend Guesser
+            </h2>
+            <p class="text-slate-600 mb-8">Analyze the shape of the data and select the most accurate, academic phrasing.</p>
+            
+            <div class="grid md:grid-cols-3 gap-8" id="guesser-container">
+                <!-- Dynamically generated by JS -->
+            </div>
+        </section>
+
+        <!-- ACTIVITY 4: SEMANTIC WORD WEBS (Interactive) -->
+        <section id="wordwebs" class="bg-white rounded-[2rem] p-8 shadow-xl border border-slate-100">
+            <div class="mb-8">
+                <h2 class="text-2xl font-bold text-slate-800 flex items-center mb-2">
+                    <svg class="w-6 h-6 mr-3 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>
+                    Semantic Word Webs
+                </h2>
+                <p class="text-slate-600">Select the <strong>four</strong> words from the bank that belong to the target semantic category.</p>
+            </div>
+
+            <div id="wordwebs-container" class="space-y-10">
+                <!-- Dynamically generated by JS -->
+            </div>
+        </section>
+
+        <!-- ACTIVITY 5: MULTIPLE COLLOCATION MATCHERS -->
+        <section id="collocations" class="bg-white rounded-[2rem] p-8 shadow-xl border border-slate-100">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+                <div>
+                    <h2 class="text-2xl font-bold text-slate-800 mb-2 flex items-center">
+                        <svg class="w-6 h-6 mr-3 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5M12 21l-2-1m2 1l2-1m-2 1v-2.5M6 18l-2-1v-2.5M18 18l2-1v-2.5"></path></svg>
+                        Collocation Matchers
+                    </h2>
+                    <p class="text-slate-600">Click a word/phrase on the left, then click its natural partner on the right.</p>
+                </div>
+            </div>
+
+            <!-- Set Navigation -->
+            <div class="flex flex-wrap gap-2 mb-8" id="colloc-set-nav">
+                <!-- Buttons injected via JS -->
+            </div>
+            
+            <div class="flex flex-col md:flex-row gap-6 max-w-4xl mx-auto bg-slate-50 p-8 rounded-2xl border border-slate-200">
+                <div class="flex-1 flex flex-col gap-4" id="colloc-left"></div>
+                <div class="flex-1 flex flex-col gap-4" id="colloc-right"></div>
+            </div>
+            <div id="colloc-feedback" class="mt-6 text-center font-bold text-lg hidden"></div>
+        </section>
+
+        <!-- ACTIVITY 6: THE ODD ONE OUT -->
+        <section id="oddoneout" class="bg-white rounded-[2rem] p-8 shadow-xl border border-slate-100">
+            <h2 class="text-2xl font-bold text-slate-800 mb-2 flex items-center">
+                <svg class="w-6 h-6 mr-3 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                The Odd One Out
+            </h2>
+            <p class="text-slate-600 mb-8">Three words in each group are strongly related. Click the <strong>one word that does NOT belong</strong>.</p>
+            
+            <div id="odd-container" class="space-y-6">
+                <!-- Dynamically generated by JS -->
+            </div>
+        </section>
+
+        <!-- ==========================================
+             GAMES SECTION
+             ========================================== -->
+        <div id="games" class="pt-8 border-t-2 border-dashed border-slate-200">
+            <h1 class="text-4xl font-lora font-bold text-center text-slate-800 mb-2">Interactive Game Zone</h1>
+            <p class="text-center text-slate-500 mb-12">Put your vocabulary to the test with these interactive challenges.</p>
+
+            <!-- GAME 1: SENTENCE MAKER -->
+            <section class="bg-indigo-900 rounded-[2rem] p-8 shadow-xl text-white mb-12 relative overflow-hidden">
+                <div class="absolute -right-10 -top-10 opacity-10">
+                    <svg class="w-64 h-64" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L2 22h20L12 2z"></path></svg>
+                </div>
+                <h2 class="text-3xl font-bold mb-2 flex items-center relative z-10 text-indigo-100">
+                    Game 1: Sentence Maker
+                </h2>
+                <p class="text-indigo-200 mb-8 relative z-10">Unscramble the words to build a grammatically perfect Band 7+ sentence describing data.</p>
+                
+                <div class="bg-white/10 backdrop-blur-md p-6 rounded-2xl border border-white/20 relative z-10">
+                    <div class="flex justify-between items-center mb-4">
+                        <span class="text-sm font-bold text-indigo-300 uppercase tracking-widest">Level <span id="sm-level">1</span>/4</span>
+                        <span id="sm-status" class="font-bold text-emerald-400 hidden">✓ Perfect!</span>
+                    </div>
+
+                    <!-- Built Sentence Area -->
+                    <div class="bg-indigo-950/50 min-h-[80px] rounded-xl p-4 mb-6 border-2 border-indigo-500/50 flex flex-wrap gap-2 items-start" id="sm-answer-box">
+                        <!-- Clicked words go here -->
+                    </div>
+
+                    <!-- Word Pool -->
+                    <div class="min-h-[80px] flex flex-wrap gap-3 justify-center mb-8" id="sm-word-pool">
+                        <!-- Scrambled words -->
+                    </div>
+
+                    <div class="flex justify-center gap-4">
+                        <button onclick="checkSentenceMaker()" class="bg-emerald-500 hover:bg-emerald-400 text-white font-bold py-3 px-8 rounded-xl shadow-lg transition-colors">
+                            Check Sentence
+                        </button>
+                        <button id="sm-next-btn" onclick="nextSentence()" class="bg-indigo-500 hover:bg-indigo-400 text-white font-bold py-3 px-8 rounded-xl shadow-lg transition-colors hidden">
+                            Next Level ➔
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- GAME 2: MEMORY MATCH -->
+            <section class="bg-slate-800 rounded-[2rem] p-8 shadow-xl text-white mb-12">
+                <h2 class="text-3xl font-bold mb-2 flex items-center text-sky-300">
+                    Game 2: Trend Memory Match
+                </h2>
+                <p class="text-slate-300 mb-8">Flip the cards to match the Academic Verb with its correct Synonym or Definition.</p>
+                
+                <div class="grid grid-cols-3 md:grid-cols-4 gap-4" id="memory-board">
+                    <!-- Cards injected by JS -->
+                </div>
+                
+                <div class="mt-8 flex justify-between items-center">
+                    <p class="font-bold text-slate-300 text-lg">Moves: <span id="memory-moves" class="text-white">0</span></p>
+                    <button onclick="initMemoryGame()" class="bg-sky-600 hover:bg-sky-500 text-white font-bold py-2 px-6 rounded-lg transition-colors">
+                        Restart Game
+                    </button>
+                </div>
+                <div id="memory-win" class="mt-6 text-center font-black text-2xl text-emerald-400 hidden fade-in">
+                    🎉 Excellent Memory! You cleared the board!
+                </div>
+            </section>
+
+            <!-- GAME 3: SPEED GAP FILL -->
+            <section class="bg-white rounded-[2rem] p-8 shadow-xl border border-slate-200 mb-12">
+                <h2 class="text-3xl font-bold mb-2 flex items-center text-slate-800">
+                    Game 3: The Missing Data
+                </h2>
+                <p class="text-slate-600 mb-8">Click a word from the bank, then it will automatically fill the next available blank in the paragraph. Complete the report!</p>
+                
+                <!-- Word Bank -->
+                <div class="bg-slate-100 p-6 rounded-2xl border border-slate-200 mb-8 flex flex-wrap gap-3 justify-center" id="gf-bank">
+                    <!-- Words injected here -->
+                </div>
+
+                <!-- Paragraph -->
+                <div class="bg-white border-2 border-indigo-100 p-8 rounded-2xl shadow-inner text-lg leading-loose text-slate-700 font-lora" id="gf-paragraph">
+                    <!-- Text with blanks injected here -->
+                </div>
+
+                <div class="mt-8 flex justify-center gap-4">
+                    <button onclick="resetGapFill()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-3 px-8 rounded-xl transition-colors">
+                        Reset
+                    </button>
+                    <button onclick="checkGapFill()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-xl shadow-md transition-colors">
+                        Submit Report
+                    </button>
+                </div>
+                <div id="gf-feedback" class="mt-6 text-center font-bold text-lg hidden fade-in"></div>
+            </section>
+        </div>
+    </div>
+
+    <!-- Logic and Data -->
+    <script>
+        /* =========================================================
+           1. DATA MODELS
+           ========================================================= */
+        const flashcards = [
+            { word: 'Rise', type: 'Verb / Noun', def: 'To move upwards or increase in amount.', example: 'Profits saw a steady rise.', cols: 'A steady rise, To rise sharply' },
+            { word: 'Increase', type: 'Verb / Noun', def: 'To become larger in amount or number.', example: 'There was a significant increase in tourism.', cols: 'A significant increase, To increase gradually' },
+            { word: 'Climb', type: 'Verb / Noun', def: 'To go up or increase, often steadily.', example: 'Interest rates climbed to 5%.', cols: 'Climbed steadily, A slow climb' },
+            { word: 'Grow / Growth', type: 'Verb / Noun', def: 'To increase in size or amount over time.', example: 'The population showed rapid growth.', cols: 'Rapid growth, To grow substantially' },
+            { word: 'Go up', type: 'Verb', def: 'To become higher in level.', example: 'The cost of materials went up again.', cols: 'Went up slightly, Went up sharply' },
+            { word: 'Decrease', type: 'Verb / Noun', def: 'To become less, or to make something become less.', example: 'The unemployment rate decreased.', cols: 'A sharp decrease, Decreased significantly' },
+            { word: 'Drop', type: 'Verb / Noun', def: 'To fall to a lower amount or value.', example: 'Temperatures dropped overnight.', cols: 'A sudden drop, Dropped slightly' },
+            { word: 'Fall', type: 'Verb / Noun', def: 'To go down to a lower level or amount.', example: 'The number of accidents fell sharply.', cols: 'A steep fall, To fall dramatically' },
+            { word: 'Decline', type: 'Verb / Noun', def: 'To gradually become less, worse, or lower.', example: 'Manufacturing jobs went into decline.', cols: 'A steady decline, Declined considerably' },
+            { word: 'Fluctuate / Fluctuation', type: 'Verb / Noun', def: 'To rise and fall irregularly in number or amount.', example: 'Temperatures fluctuated wildly during April.', cols: 'Fluctuated wildly, Minor fluctuations' },
+            { word: 'Dip', type: 'Verb / Noun', def: 'To go down to a lower level temporarily, before recovering.', example: 'Sales dipped slightly in the summer.', cols: 'A brief dip, Dipped fractionally' },
+            { word: 'Remain steady', type: 'Phrase', def: 'To stay at the same level without fluctuating.', example: 'Prices remained steady throughout the year.', cols: 'Remained steady at 10%' },
+            { word: 'Remain stable', type: 'Phrase', def: 'To not change or fluctuate.', example: 'The proportion remained stable at 10%.', cols: 'Remained stable at, Relatively stable' },
+            { word: 'Remain unchanged', type: 'Phrase', def: 'To show no difference over a period of time.', example: 'The numbers remained unchanged for a decade.', cols: 'Remained unchanged throughout' },
+            { word: 'Level off', type: 'Phrasal Verb', def: 'To stop rising or falling and become steady.', example: 'After a sharp rise, prices levelled off.', cols: 'Levelled off at 50%' },
+            { word: 'Peak at / Reach a peak', type: 'Phrase', def: 'To reach the highest point or value.', example: 'Sales reached a peak of $2M in December.', cols: 'Peaked at, Reached a peak of' },
+            { word: 'Hit a high of', type: 'Phrase', def: 'To attain a specific high level.', example: 'The stock hit a high of $50.', cols: 'Hit a record high of' },
+            { word: 'Hit a low of', type: 'Phrase', def: 'To reach a specific lowest value.', example: 'The temperature hit a low of -5°C.', cols: 'Hit an all-time low of' },
+            { word: 'Bottom out', type: 'Phrasal Verb', def: 'To reach the lowest point and stop falling.', example: 'The recession finally bottomed out in 2009.', cols: 'Bottomed out at 5 units' },
+            { word: 'Dramatically / Dramatic', type: 'Adverb / Adjective', def: 'Very sudden or noticeable change.', example: 'There was a dramatic increase in sales.', cols: 'Rose dramatically, Dramatic fall' },
+            { word: 'Sharply / Sharp', type: 'Adverb / Adjective', def: 'A sudden and rapid change.', example: 'A sharp drop in prices occurred.', cols: 'Fell sharply, A sharp climb' },
+            { word: 'Enormously / Enormous', type: 'Adverb / Adjective', def: 'Extremely large in size or amount.', example: 'The profits grew enormously.', cols: 'Grew enormously, Enormous growth' },
+            { word: 'Steeply / Steep', type: 'Adverb / Adjective', def: 'Rising or falling at a sharp angle; rapid.', example: 'Prices climbed steeply.', cols: 'A steep rise, Dropped steeply' },
+            { word: 'Substantially / Substantial', type: 'Adverb / Adjective', def: 'Large in amount or value.', example: 'There was a substantial rise in costs.', cols: 'Increased substantially, Substantial decline' },
+            { word: 'Considerably / Considerable', type: 'Adverb / Adjective', def: 'Large or of noticeable importance.', example: 'Numbers declined considerably.', cols: 'Considerable drop, Grew considerably' },
+            { word: 'Significantly / Significant', type: 'Adverb / Adjective', def: 'Large or important enough to be noticed.', example: 'A significant decline was seen.', cols: 'Significant increase, Dropped significantly' },
+            { word: 'Rapidly / Rapid', type: 'Adverb / Adjective', def: 'Happening in a short amount of time; fast.', example: 'The population increased rapidly.', cols: 'A rapid fall, Grew rapidly' },
+            { word: 'Moderately / Moderate', type: 'Adverb / Adjective', def: 'Average in amount, intensity, or degree.', example: 'Sales increased moderately.', cols: 'A moderate rise, Grew moderately' },
+            { word: 'Gradually / Gradual', type: 'Adverb / Adjective', def: 'Happening slowly over a period of time.', example: 'A gradual rise in temperature.', cols: 'A gradual decline, Increased gradually' },
+            { word: 'Slightly / Slight', type: 'Adverb / Adjective', def: 'Small in degree or amount.', example: 'There was a slight dip in the market.', cols: 'A slight drop, Increased slightly' },
+            { word: 'Fractionally / Fractional', type: 'Adverb / Adjective', def: 'To a very small degree.', example: 'Usage dipped fractionally in 2010.', cols: 'A fractional dip, Rose fractionally' }
+        ];
+
+        const rewrites = [
+            { original: "The prices fell sharply in 2008.", prompt1: "There was a", prompt2: "in prices in 2008.", ans: ["sharp", "fall"] },
+            { original: "The population grew steadily.", prompt1: "There was a", prompt2: "in the population.", ans: ["steady", "growth"] },
+            { original: "Sales fluctuated wildly.", prompt1: "There were", prompt2: "in sales.", ans: ["wild", "fluctuations"] },
+            { original: "Demand increased dramatically.", prompt1: "There was a", prompt2: "in demand.", ans: ["dramatic", "increase"] },
+            { original: "Prices climbed steeply.", prompt1: "There was a", prompt2: "in prices.", ans: ["steep", "climb"] },
+            { original: "Numbers declined considerably.", prompt1: "There was a", prompt2: "in numbers.", ans: ["considerable", "decline"] },
+            { original: "Usage dipped fractionally.", prompt1: "There was a", prompt2: "in usage.", ans: ["fractional", "dip"] },
+            { original: "The rate rose enormously.", prompt1: "There was an", prompt2: "in the rate.", ans: ["enormous", "rise"] },
+            { original: "Production fell rapidly.", prompt1: "There was a", prompt2: "in production.", ans: ["rapid", "fall"] }
+        ];
+
+        const guessers = [
+            { chart: [10, 9.5, 9, 8.5, 8, 7.5], options: ["A sudden plummet", "A gradual decline", "A slight dip"], correct: "A gradual decline" },
+            { chart: [2, 10, 3, 9, 2, 8], options: ["Wild fluctuations", "A steady climb", "A dramatic peak"], correct: "Wild fluctuations" },
+            { chart: [5, 5, 5.1, 5, 5, 5], options: ["A sharp surge", "A steady plateau", "An erratic trajectory"], correct: "A steady plateau" },
+            { chart: [10, 5, 2, 2, 3, 5], options: ["Bottomed out", "Levelled off", "Hit a peak"], correct: "Bottomed out" },
+            { chart: [2, 5, 10, 9, 6, 4], options: ["Remained stable", "A steep climb", "Reached a peak"], correct: "Reached a peak" },
+            { chart: [2, 3, 4, 8, 15, 20], options: ["A steep climb", "A gradual rise", "A slight fluctuation"], correct: "A steep climb" }
+        ];
+
+        // MULTIPLE COLLOCATION SETS
+        const collocationSets = [
+            {
+                name: "Degree & Speed",
+                pairs: [
+                    { left: "A dramatic", right: "surge in prices." },
+                    { left: "A gradual", right: "decline over ten years." },
+                    { left: "Wild", right: "fluctuations throughout the period." },
+                    { left: "A steady", right: "growth in the population." },
+                    { left: "A sharp", right: "drop in overall sales." }
+                ]
+            },
+            {
+                name: "Extremes & Stability",
+                pairs: [
+                    { left: "Reached a", right: "peak of 50%." },
+                    { left: "Bottomed", right: "out at 10 units." },
+                    { left: "Levelled", right: "off after a brief rise." },
+                    { left: "Remained", right: "relatively stable." },
+                    { left: "Hit an", right: "all-time low." }
+                ]
+            },
+            {
+                name: "Verbs + Adverbs",
+                pairs: [
+                    { left: "Increased", right: "significantly over the decade." },
+                    { left: "Fell", right: "sharply during the recession." },
+                    { left: "Fluctuated", right: "wildly in the first quarter." },
+                    { left: "Rose", right: "steadily until 2015." },
+                    { left: "Declined", right: "moderately before recovering." }
+                ]
+            },
+            {
+                name: "Proportions",
+                pairs: [
+                    { left: "A tiny", right: "fraction of the total." },
+                    { left: "The vast", right: "majority of respondents." },
+                    { left: "Exactly", right: "a quarter of the budget." },
+                    { left: "Roughly", right: "one-third of the pie." },
+                    { left: "Accounted", right: "for the largest segment." }
+                ]
+            },
+            {
+                name: "Prepositions",
+                pairs: [
+                    { left: "An increase", right: "of exactly 15 percent." },
+                    { left: "Dropped", right: "by almost 10 units." },
+                    { left: "Stood", right: "at 500 in the beginning." },
+                    { left: "Rose", right: "from 10 to 20 overall." },
+                    { left: "Oscillated", right: "between 30 and 40." }
+                ]
+            }
+        ];
+
+        const wordWebsData = [
+            {
+                title: "UPWARD TRENDS (Verbs/Nouns)",
+                instruction: "Select the 4 words that indicate an upward movement.",
+                options: ["Rise", "Plummet", "Climb", "Dip", "Grow", "Drop", "Soar", "Slump"],
+                correct: ["Rise", "Climb", "Grow", "Soar"]
+            },
+            {
+                title: "DOWNWARD TRENDS (Verbs/Nouns)",
+                instruction: "Select the 4 words that indicate a downward movement.",
+                options: ["Fall", "Surge", "Decline", "Decrease", "Peak", "Go up", "Drop", "Grow"],
+                correct: ["Fall", "Decline", "Decrease", "Drop"]
+            },
+            {
+                title: "STABILITY & FLAT TRENDS",
+                instruction: "Select the 3 phrases/words that indicate no significant change.",
+                options: ["Fluctuate", "Level off", "Remain steady", "Oscillate", "Plateau", "Dip"],
+                correct: ["Level off", "Remain steady", "Plateau"]
+            }
+        ];
+
+        const oddOneOutData = [
+            {
+                topic: "SPEED OF CHANGE (FAST)",
+                options: ["Rapid", "Sudden", "Gradual", "Sharp"],
+                wrong: "Gradual",
+                reason: "'Gradual' means slow and steady, while the others mean fast or sudden."
+            },
+            {
+                topic: "DEGREE OF CHANGE (LARGE)",
+                options: ["Enormous", "Substantial", "Significant", "Fractional"],
+                wrong: "Fractional",
+                reason: "'Fractional' means very small, while the others mean very large."
+            },
+            {
+                topic: "VOLATILITY",
+                options: ["Fluctuate", "Oscillate", "Erratic", "Stable"],
+                wrong: "Stable",
+                reason: "'Stable' means unchanging, while the others refer to moving up and down unpredictably."
+            }
+        ];
+
+        /* =========================================================
+           2. FLASHCARD LOGIC
+           ========================================================= */
+        let currentCard = 0;
+        let isFlipped = false;
+
+        const fcInner = document.getElementById('flashcard-inner');
+        const fcWord = document.getElementById('fc-word');
+        const fcType = document.getElementById('fc-type');
+        const fcDef = document.getElementById('fc-def');
+        const fcCols = document.getElementById('fc-cols');
+        const fcCurrent = document.getElementById('card-current');
+        const fcTotal = document.getElementById('card-total');
+
+        fcTotal.innerText = flashcards.length;
+
+        function updateCardUI() {
+            const card = flashcards[currentCard];
+            fcWord.innerText = card.word;
+            fcType.innerText = card.type;
+            fcDef.innerText = card.def;
+            fcCols.innerText = `${card.example}\n[ ${card.cols} ]`;
+            fcCurrent.innerText = currentCard + 1;
+        }
+        updateCardUI();
+
+        function toggleFlashcard() {
+            isFlipped = !isFlipped;
+            fcInner.style.transform = isFlipped ? 'rotateY(180deg)' : 'rotateY(0deg)';
+        }
+
+        function nextCard() {
+            currentCard = (currentCard + 1) % flashcards.length;
+            resetAndFlip();
+        }
+
+        function prevCard() {
+            currentCard = currentCard === 0 ? flashcards.length - 1 : currentCard - 1;
+            resetAndFlip();
+        }
+
+        function resetAndFlip() {
+            isFlipped = false;
+            fcInner.style.transform = 'rotateY(0deg)';
+            setTimeout(updateCardUI, 150);
+        }
+
+        /* =========================================================
+           3. REWRITES LOGIC
+           ========================================================= */
+        const rewriteContainer = document.getElementById('rewrite-container');
+        rewrites.forEach((rw, idx) => {
+            let inputsHtml = rw.ans.map((_, iIdx) => 
+                `<input type="text" id="rw-${idx}-${iIdx}" class="border-b-2 border-slate-300 bg-transparent text-center font-bold text-slate-900 outline-none w-32 mx-1 transition-colors focus:border-indigo-500" placeholder="...">`
+            ).join('');
+
+            rewriteContainer.innerHTML += `
+                <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200 flex flex-col lg:flex-row lg:items-center gap-6">
+                    <div class="flex-1">
+                        <div class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">Original Verb/Adverb:</div>
+                        <p class="font-lora text-lg font-bold text-slate-800 italic border-l-4 border-emerald-400 pl-3">"${rw.original}"</p>
+                    </div>
+                    <div class="flex-1 bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-wrap items-center gap-y-3 relative text-lg">
+                        <span class="font-medium text-slate-700 mr-2">${rw.prompt1}</span>
+                        ${inputsHtml}
+                        <span class="font-medium text-slate-700 ml-2">${rw.prompt2}</span>
+                        <div id="rw-feedback-${idx}" class="w-full mt-3 hidden text-sm font-bold"></div>
+                    </div>
+                </div>
+            `;
+        });
+
+        function checkRewrites() {
+            rewrites.forEach((rw, idx) => {
+                let allCorrect = true;
+                rw.ans.forEach((ansText, iIdx) => {
+                    const input = document.getElementById(`rw-${idx}-${iIdx}`);
+                    if (input.value.trim().toLowerCase() === ansText.toLowerCase()) {
+                        input.className = "border-b-2 bg-emerald-50 text-center font-bold outline-none w-32 mx-1 transition-colors input-correct rounded-t";
+                    } else {
+                        input.className = "border-b-2 bg-rose-50 text-center font-bold outline-none w-32 mx-1 transition-colors input-incorrect rounded-t";
+                        allCorrect = false;
+                    }
+                });
+
+                const feedback = document.getElementById(`rw-feedback-${idx}`);
+                feedback.classList.remove('hidden');
+                if (allCorrect) {
+                    feedback.className = "w-full mt-3 text-sm font-bold text-emerald-600 fade-in flex items-center";
+                    feedback.innerHTML = `<svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg> Perfect Rewrite!`;
+                } else {
+                    feedback.className = "w-full mt-3 text-sm font-bold text-rose-600 bg-rose-50 px-3 py-2 rounded-lg border border-rose-200 fade-in flex items-center";
+                    feedback.innerHTML = `Correct Form: ${rw.ans.join(' ')}`;
+                }
+            });
+        }
+
+        /* =========================================================
+           4. VISUAL TREND GUESSER LOGIC
+           ========================================================= */
+        const guesserContainer = document.getElementById('guesser-container');
+        let userGuesses = {};
+        
+        guessers.forEach((gs, idx) => {
+            let optionsHtml = gs.options.map((opt, oIdx) => 
+                `<button id="btn-gs-${idx}-${oIdx}" onclick="selectGuess(${idx}, '${opt}', ${oIdx})" class="w-full text-left px-4 py-2.5 rounded-xl font-semibold border-2 border-slate-200 bg-white text-slate-600 hover:border-amber-300 transition-colors mb-2">${opt}</button>`
+            ).join('');
+
+            guesserContainer.innerHTML += `
+                <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200 flex flex-col">
+                    <div class="bg-white rounded-xl p-3 shadow-sm border border-slate-100 mb-5 relative h-32 w-full">
+                        <canvas id="chart-${idx}"></canvas>
+                    </div>
+                    <div class="mt-auto">
+                        ${optionsHtml}
+                    </div>
+                    <div id="guess-feedback-${idx}" class="mt-4 p-3 rounded-xl text-sm font-bold hidden shadow-inner"></div>
+                </div>
+            `;
+        });
+
+        // Initialize Charts
+        guessers.forEach((gs, idx) => {
+            const ctx = document.getElementById(`chart-${idx}`).getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: { labels: ['1','2','3','4','5','6'], datasets: [{ data: gs.chart, borderColor: '#f59e0b', tension: 0.3, borderWidth: 3 }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { enabled: false } }, scales: { x: { display: false }, y: { display: false } }, animation: false }
+            });
+        });
+
+        function selectGuess(qIdx, selectedOpt, btnIdx) {
+            userGuesses[qIdx] = selectedOpt;
+            const gs = guessers[qIdx];
+            
+            // Reset buttons
+            gs.options.forEach((_, i) => {
+                const btn = document.getElementById(`btn-gs-${qIdx}-${i}`);
+                btn.className = "w-full text-left px-4 py-2.5 rounded-xl font-semibold border-2 border-slate-200 bg-white text-slate-600 hover:border-amber-300 transition-colors mb-2";
+            });
+
+            // Highlight selected
+            const activeBtn = document.getElementById(`btn-gs-${qIdx}-${btnIdx}`);
+            activeBtn.className = "w-full text-left px-4 py-2.5 rounded-xl font-semibold border-2 border-amber-400 bg-amber-50 text-amber-900 transition-colors mb-2";
+
+            // Show feedback
+            const feedback = document.getElementById(`guess-feedback-${qIdx}`);
+            feedback.classList.remove('hidden');
+            if (selectedOpt === gs.correct) {
+                feedback.className = "mt-4 p-3 rounded-xl text-sm font-bold flex items-center shadow-inner bg-emerald-100 text-emerald-800 border border-emerald-300 fade-in";
+                feedback.innerHTML = "✓ Correct interpretation!";
+            } else {
+                feedback.className = "mt-4 p-3 rounded-xl text-sm font-bold flex items-center shadow-inner bg-rose-100 text-rose-800 border border-rose-300 fade-in";
+                feedback.innerHTML = `✗ Incorrect. It's '${gs.correct}'.`;
+            }
+        }
+
+        /* =========================================================
+           5. MULTIPLE COLLOCATION MATCHERS
+           ========================================================= */
+        let currentCollocSetIndex = 0;
+        let shuffledLeft = [];
+        let shuffledRight = [];
+        let activeLeftId = null;
+        let activeRightId = null;
+        let matchedIds = [];
+
+        const collocSetNav = document.getElementById('colloc-set-nav');
+        const collocLeft = document.getElementById('colloc-left');
+        const collocRight = document.getElementById('colloc-right');
+        const collocFeedback = document.getElementById('colloc-feedback');
+
+        function initCollocationSets() {
+            collocSetNav.innerHTML = collocationSets.map((set, idx) => `
+                <button onclick="loadCollocSet(${idx})" id="colloc-btn-${idx}" class="px-4 py-2 rounded-full font-semibold border-2 transition-colors text-sm ${idx === 0 ? 'bg-purple-600 text-white border-purple-600' : 'bg-white text-slate-600 border-slate-200 hover:border-purple-300'}">
+                    Set ${idx + 1}: ${set.name}
+                </button>
+            `).join('');
+            loadCollocSet(0);
+        }
+
+        function loadCollocSet(index) {
+            currentCollocSetIndex = index;
+            matchedIds = [];
+            activeLeftId = null;
+            activeRightId = null;
+            collocFeedback.classList.add('hidden');
+            
+            // Update nav buttons
+            collocationSets.forEach((_, idx) => {
+                const btn = document.getElementById(`colloc-btn-${idx}`);
+                if(idx === index) {
+                    btn.className = "px-4 py-2 rounded-full font-semibold border-2 bg-purple-600 text-white border-purple-600 text-sm";
+                } else {
+                    btn.className = "px-4 py-2 rounded-full font-semibold border-2 bg-white text-slate-600 border-slate-200 hover:border-purple-300 text-sm transition-colors";
+                }
+            });
+
+            // Prepare data with IDs
+            const currentData = collocationSets[index].pairs.map((p, i) => ({...p, id: i}));
+            shuffledLeft = [...currentData].sort(() => Math.random() - 0.5);
+            shuffledRight = [...currentData].sort(() => Math.random() - 0.5);
+
+            renderCollocations();
+        }
+
+        function renderCollocations() {
+            collocLeft.innerHTML = '';
+            collocRight.innerHTML = '';
+
+            shuffledLeft.forEach((item) => {
+                const isMatched = matchedIds.includes(item.id);
+                const isSelected = activeLeftId === item.id;
+                let classes = "w-full text-left px-5 py-4 rounded-xl font-bold border-2 transition-all shadow-sm ";
+                
+                if (isMatched) classes += "bg-emerald-100 border-emerald-400 text-emerald-800 opacity-70 cursor-default";
+                else if (isSelected) classes += "bg-indigo-100 border-indigo-500 text-indigo-900";
+                else classes += "bg-white border-slate-200 text-slate-700 hover:border-indigo-300 cursor-pointer";
+
+                collocLeft.innerHTML += `<button onclick="handleCollocClick('left', ${item.id})" class="${classes}" ${isMatched ? 'disabled' : ''}>${item.left}</button>`;
+            });
+
+            shuffledRight.forEach((item) => {
+                const isMatched = matchedIds.includes(item.id);
+                const isSelected = activeRightId === item.id;
+                let classes = "w-full text-left px-5 py-4 rounded-xl font-bold border-2 transition-all shadow-sm ";
+                
+                if (isMatched) classes += "bg-emerald-100 border-emerald-400 text-emerald-800 opacity-70 cursor-default";
+                else if (isSelected) classes += "bg-indigo-100 border-indigo-500 text-indigo-900";
+                else classes += "bg-white border-slate-200 text-slate-700 hover:border-indigo-300 cursor-pointer";
+
+                collocRight.innerHTML += `<button onclick="handleCollocClick('right', ${item.id})" class="${classes}" ${isMatched ? 'disabled' : ''}>${item.right}</button>`;
+            });
+
+            if (matchedIds.length === 5) { // 5 pairs per set
+                collocFeedback.classList.remove('hidden');
+                collocFeedback.className = "mt-6 text-center font-black text-xl text-emerald-600 fade-in";
+                collocFeedback.innerHTML = "🎉 All Collocations Matched!";
+            }
+        }
+
+        function handleCollocClick(side, id) {
+            if (matchedIds.includes(id)) return;
+            if (side === 'left') activeLeftId = (activeLeftId === id) ? null : id;
+            if (side === 'right') activeRightId = (activeRightId === id) ? null : id;
+
+            renderCollocations();
+
+            if (activeLeftId !== null && activeRightId !== null) {
+                setTimeout(checkCollocMatch, 300); // slight delay for UX
+            }
+        }
+
+        function checkCollocMatch() {
+            if (activeLeftId === activeRightId) {
+                matchedIds.push(activeLeftId);
+                activeLeftId = null;
+                activeRightId = null;
+            } else {
+                activeLeftId = null;
+                activeRightId = null;
+            }
+            renderCollocations();
+        }
+
+        initCollocationSets();
+
+        /* =========================================================
+           6. SEMANTIC WORD WEBS LOGIC
+           ========================================================= */
+        const websContainer = document.getElementById('wordwebs-container');
+        let webSelections = {};
+
+        wordWebsData.forEach((web, wIdx) => {
+            webSelections[wIdx] = [];
+            let buttonsHtml = web.options.map((opt, oIdx) => 
+                `<button id="btn-web-${wIdx}-${oIdx}" onclick="toggleWebSelect(${wIdx}, '${opt}', ${oIdx})" class="btn-selectable px-5 py-3 rounded-xl font-semibold bg-white text-slate-700 shadow-sm">${opt}</button>`
+            ).join('');
+
+            websContainer.innerHTML += `
+                <div class="bg-indigo-50/50 p-6 rounded-2xl border border-indigo-100">
+                    <div class="mb-4">
+                        <span class="bg-indigo-600 text-white px-3 py-1 rounded-md text-xs font-bold uppercase tracking-wider mr-2">Target</span>
+                        <span class="text-xl font-black text-slate-800">${web.title}</span>
+                    </div>
+                    <p class="text-sm text-slate-600 mb-4">${web.instruction}</p>
+                    <div class="flex flex-wrap gap-3 mb-6">
+                        ${buttonsHtml}
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <button onclick="checkWeb(${wIdx})" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-6 rounded-lg shadow transition-colors">Check Selection</button>
+                        <div id="web-feedback-${wIdx}" class="text-sm font-bold hidden"></div>
+                    </div>
+                </div>
+            `;
+        });
+
+        function toggleWebSelect(wIdx, opt, btnIdx) {
+            const btn = document.getElementById(`btn-web-${wIdx}-${btnIdx}`);
+            const selections = webSelections[wIdx];
+            
+            if (selections.includes(opt)) {
+                // Deselect
+                webSelections[wIdx] = selections.filter(item => item !== opt);
+                btn.classList.remove('btn-selected');
+            } else {
+                // Select
+                if (selections.length < wordWebsData[wIdx].correct.length) {
+                    webSelections[wIdx].push(opt);
+                    btn.classList.add('btn-selected');
+                }
+            }
+        }
+
+        function checkWeb(wIdx) {
+            const web = wordWebsData[wIdx];
+            const selections = webSelections[wIdx];
+            const feedback = document.getElementById(`web-feedback-${wIdx}`);
+            
+            feedback.classList.remove('hidden');
+            
+            if (selections.length < web.correct.length) {
+                feedback.className = "text-sm font-bold text-amber-600";
+                feedback.innerHTML = `Please select exactly ${web.correct.length} words.`;
+                return;
+            }
+
+            // Verify
+            let allCorrect = true;
+            web.options.forEach((opt, oIdx) => {
+                const btn = document.getElementById(`btn-web-${wIdx}-${oIdx}`);
+                const isSelected = selections.includes(opt);
+                const isCorrectAns = web.correct.includes(opt);
+
+                if (isSelected && isCorrectAns) {
+                    btn.className = "px-5 py-3 rounded-xl font-semibold shadow-sm btn-correct";
+                } else if (isSelected && !isCorrectAns) {
+                    btn.className = "px-5 py-3 rounded-xl font-semibold shadow-sm btn-wrong";
+                    allCorrect = false;
+                } else if (!isSelected && isCorrectAns) {
+                    btn.className = "px-5 py-3 rounded-xl font-semibold shadow-sm border-2 border-emerald-500 text-emerald-700 bg-white"; // Highlight missed correct answers
+                    allCorrect = false;
+                } else {
+                    btn.className = "px-5 py-3 rounded-xl font-semibold bg-white text-slate-400 border-2 border-slate-100 opacity-50";
+                }
+                btn.disabled = true; // Lock after checking
+            });
+
+            if (allCorrect) {
+                feedback.className = "text-sm font-bold text-emerald-600 fade-in";
+                feedback.innerHTML = "Perfect mapping!";
+            } else {
+                feedback.className = "text-sm font-bold text-rose-600 fade-in";
+                feedback.innerHTML = "Not quite. See the correct answers highlighted.";
+            }
+        }
+
+        /* =========================================================
+           7. ODD ONE OUT LOGIC
+           ========================================================= */
+        const oddContainer = document.getElementById('odd-container');
+        
+        oddOneOutData.forEach((odd, idx) => {
+            let optionsHtml = odd.options.map((opt, oIdx) => 
+                `<button id="btn-odd-${idx}-${oIdx}" onclick="selectOdd(${idx}, '${opt}', ${oIdx})" class="px-5 py-3 rounded-xl font-semibold bg-white border-2 border-slate-200 text-slate-700 hover:border-slate-400 shadow-sm transition-all">${opt}</button>`
+            ).join('');
+
+            oddContainer.innerHTML += `
+                <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200">
+                    <div class="mb-4 text-xs font-black text-slate-500 uppercase tracking-widest bg-white border border-slate-200 px-3 py-1 rounded inline-block">Category: ${odd.topic}</div>
+                    <div class="flex flex-wrap gap-4 mb-4">
+                        ${optionsHtml}
+                    </div>
+                    <div id="odd-feedback-${idx}" class="p-4 rounded-xl text-sm font-medium hidden shadow-inner"></div>
+                </div>
+            `;
+        });
+
+        function selectOdd(qIdx, selectedOpt, btnIdx) {
+            const odd = oddOneOutData[qIdx];
+            const feedback = document.getElementById(`odd-feedback-${qIdx}`);
+            
+            // Disable all buttons in this row
+            odd.options.forEach((_, oIdx) => {
+                const btn = document.getElementById(`btn-odd-${qIdx}-${oIdx}`);
+                btn.disabled = true;
+                btn.classList.add('opacity-70');
+            });
+
+            const activeBtn = document.getElementById(`btn-odd-${qIdx}-${btnIdx}`);
+            activeBtn.classList.remove('opacity-70');
+            feedback.classList.remove('hidden');
+
+            if (selectedOpt === odd.wrong) {
+                activeBtn.className = "px-5 py-3 rounded-xl font-bold border-2 shadow-sm transition-all btn-correct";
+                feedback.className = "p-4 rounded-xl text-sm font-medium shadow-inner bg-emerald-50 border border-emerald-200 text-emerald-800 fade-in";
+                feedback.innerHTML = `<strong>Correct!</strong> ${odd.reason}`;
+            } else {
+                activeBtn.className = "px-5 py-3 rounded-xl font-bold border-2 shadow-sm transition-all btn-wrong";
+                // Reveal the correct one
+                const correctIdx = odd.options.indexOf(odd.wrong);
+                document.getElementById(`btn-odd-${qIdx}-${correctIdx}`).className = "px-5 py-3 rounded-xl font-bold border-2 border-emerald-500 bg-white text-emerald-700 shadow-sm transition-all";
+                
+                feedback.className = "p-4 rounded-xl text-sm font-medium shadow-inner bg-rose-50 border border-rose-200 text-rose-800 fade-in";
+                feedback.innerHTML = `<strong>Incorrect.</strong> The odd one out was '${odd.wrong}'. ${odd.reason}`;
+            }
+        }
+
+        /* =========================================================
+           GAMES SECTION LOGIC
+           ========================================================= */
+
+        // --- GAME 1: SENTENCE MAKER ---
+        const smLevels = [
+            { words: ["surge", "There", "in", "the", "number", "tourists.", "was", "a", "dramatic", "of"], correct: "There was a dramatic surge in the number of tourists." },
+            { words: ["fluctuated", "The", "wildly", "throughout", "the", "price", "of", "oil", "period."], correct: "The price of oil fluctuated wildly throughout the period." },
+            { words: ["Sales", "reached", "December.", "a", "peak", "in", "fifty", "thousand", "of"], correct: "Sales reached a peak of fifty thousand in December." },
+            { words: ["commuters", "relatively", "stable.", "The", "remained", "proportion", "of"], correct: "The proportion of commuters remained relatively stable." }
+        ];
+
+        let smCurrentLevel = 0;
+        let smPool = [];
+        let smAnswer = [];
+
+        const smPoolEl = document.getElementById('sm-word-pool');
+        const smAnswerEl = document.getElementById('sm-answer-box');
+        const smStatusEl = document.getElementById('sm-status');
+        const smNextBtn = document.getElementById('sm-next-btn');
+        const smLevelEl = document.getElementById('sm-level');
+
+        function initSentenceMaker() {
+            smPool = [...smLevels[smCurrentLevel].words].sort(() => Math.random() - 0.5);
+            smAnswer = [];
+            smStatusEl.classList.add('hidden');
+            smNextBtn.classList.add('hidden');
+            smLevelEl.innerText = smCurrentLevel + 1;
+            renderSentenceMaker();
+        }
+
+        function renderSentenceMaker() {
+            smPoolEl.innerHTML = smPool.map((word, idx) => 
+                `<button onclick="smMoveToAnswer(${idx})" class="sm-word bg-white text-indigo-900 font-bold px-4 py-2 rounded-lg shadow border border-indigo-200 hover:bg-indigo-50">${word}</button>`
+            ).join('');
+
+            smAnswerEl.innerHTML = smAnswer.length === 0 
+                ? `<span class="text-indigo-300/50 italic">Click words from the pool below to build your sentence...</span>`
+                : smAnswer.map((word, idx) => 
+                    `<button onclick="smMoveToPool(${idx})" class="sm-word bg-indigo-500 text-white font-bold px-4 py-2 rounded-lg shadow-sm border border-indigo-400 hover:bg-indigo-400">${word}</button>`
+                  ).join('');
+        }
+
+        function smMoveToAnswer(idx) {
+            smAnswer.push(smPool[idx]);
+            smPool.splice(idx, 1);
+            renderSentenceMaker();
+        }
+
+        function smMoveToPool(idx) {
+            smPool.push(smAnswer[idx]);
+            smAnswer.splice(idx, 1);
+            renderSentenceMaker();
+        }
+
+        function checkSentenceMaker() {
+            const currentStr = smAnswer.join(' ');
+            if (currentStr === smLevels[smCurrentLevel].correct) {
+                smStatusEl.classList.remove('hidden');
+                smStatusEl.innerHTML = "✓ Perfect Sentence!";
+                smStatusEl.className = "font-bold text-emerald-400 fade-in";
+                
+                if (smCurrentLevel < smLevels.length - 1) {
+                    smNextBtn.classList.remove('hidden');
+                } else {
+                    smNextBtn.classList.remove('hidden');
+                    smNextBtn.innerText = "Restart Game";
+                    smNextBtn.onclick = () => { smCurrentLevel = 0; initSentenceMaker(); smNextBtn.innerText = "Next Level ➔"; smNextBtn.onclick = nextSentence; };
+                }
+            } else {
+                smStatusEl.classList.remove('hidden');
+                smStatusEl.innerHTML = "✗ Incorrect structure. Keep trying!";
+                smStatusEl.className = "font-bold text-rose-400 fade-in";
+            }
+        }
+
+        function nextSentence() {
+            smCurrentLevel++;
+            initSentenceMaker();
+        }
+
+        initSentenceMaker();
+
+
+        // --- GAME 2: MEMORY MATCH ---
+        const memoryPairsData = [
+            { a: "Plummet", b: "Fall sharply", id: 1 },
+            { a: "Soar", b: "Rise dramatically", id: 2 },
+            { a: "Plateau", b: "Level off", id: 3 },
+            { a: "Fluctuate", b: "Oscillate", id: 4 },
+            { a: "Tiny fraction", b: "Very small part", id: 5 },
+            { a: "Vast majority", b: "Almost all", id: 6 }
+        ];
+
+        let memCards = [];
+        let memFlippedIndices = [];
+        let memMatchedIds = [];
+        let memMoves = 0;
+        let memLockBoard = false;
+
+        function initMemoryGame() {
+            const board = document.getElementById('memory-board');
+            document.getElementById('memory-moves').innerText = "0";
+            document.getElementById('memory-win').classList.add('hidden');
+            memMoves = 0;
+            memFlippedIndices = [];
+            memMatchedIds = [];
+            memLockBoard = false;
+
+            // Generate deck
+            memCards = [];
+            memoryPairsData.forEach(pair => {
+                memCards.push({ text: pair.a, id: pair.id });
+                memCards.push({ text: pair.b, id: pair.id });
+            });
+            // Shuffle
+            memCards.sort(() => Math.random() - 0.5);
+
+            renderMemoryBoard();
+        }
+
+        function renderMemoryBoard() {
+            const board = document.getElementById('memory-board');
+            board.innerHTML = memCards.map((card, idx) => {
+                const isFlipped = memFlippedIndices.includes(idx) || memMatchedIds.includes(card.id);
+                const isMatched = memMatchedIds.includes(card.id);
+                return `
+                    <div class="memory-card ${isFlipped ? 'flipped' : ''} ${isMatched ? 'matched' : ''}" onclick="flipMemCard(${idx})">
+                        <div class="memory-card-inner">
+                            <div class="memory-card-front">?</div>
+                            <div class="memory-card-back">${card.text}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function flipMemCard(idx) {
+            if (memLockBoard) return;
+            if (memFlippedIndices.includes(idx)) return;
+            if (memMatchedIds.includes(memCards[idx].id)) return;
+
+            memFlippedIndices.push(idx);
+            renderMemoryBoard();
+
+            if (memFlippedIndices.length === 2) {
+                memLockBoard = true;
+                memMoves++;
+                document.getElementById('memory-moves').innerText = memMoves;
+                checkMemMatch();
+            }
+        }
+
+        function checkMemMatch() {
+            const idx1 = memFlippedIndices[0];
+            const idx2 = memFlippedIndices[1];
+            
+            if (memCards[idx1].id === memCards[idx2].id) {
+                memMatchedIds.push(memCards[idx1].id);
+                memFlippedIndices = [];
+                memLockBoard = false;
+                renderMemoryBoard();
+                
+                if (memMatchedIds.length === memoryPairsData.length) {
+                    document.getElementById('memory-win').classList.remove('hidden');
+                }
+            } else {
+                setTimeout(() => {
+                    memFlippedIndices = [];
+                    memLockBoard = false;
+                    renderMemoryBoard();
+                }, 1000);
+            }
+        }
+
+        initMemoryGame();
+
+
+        // --- GAME 3: SPEED GAP FILL ---
+        const gfTemplate = "Between 2000 and 2010, the population {0} a {1} surge. However, in 2011, it {2} a peak of 5 million before it {3} to 2 million. Finally, the figures {4} off at the end of the period.";
+        const gfAnswers = ["experienced", "dramatic", "hit", "plummeted", "levelled"];
+        
+        let gfBankWords = [];
+        let gfBlanks = ["", "", "", "", ""];
+
+        function initGapFill() {
+            gfBankWords = [...gfAnswers].sort(() => Math.random() - 0.5);
+            gfBlanks = ["", "", "", "", ""];
+            document.getElementById('gf-feedback').classList.add('hidden');
+            renderGapFill();
+        }
+
+        function renderGapFill() {
+            // Render Bank
+            const bankEl = document.getElementById('gf-bank');
+            bankEl.innerHTML = gfBankWords.length === 0 
+                ? `<span class="text-slate-400 italic">All words used. Submit report.</span>` 
+                : gfBankWords.map((w, idx) => `<button onclick="gfMoveToBlank(${idx})" class="bg-white border-2 border-indigo-200 text-indigo-700 font-bold px-4 py-2 rounded-lg shadow-sm hover:border-indigo-400 hover:bg-indigo-50 transition-colors">${w}</button>`).join('');
+
+            // Render Text
+            let htmlText = gfTemplate;
+            gfBlanks.forEach((bVal, bIdx) => {
+                const blankHtml = bVal === "" 
+                    ? `<span class="gap-fill-blank"></span>` 
+                    : `<span class="gap-fill-blank filled" onclick="gfMoveToBank(${bIdx})">${bVal}</span>`;
+                htmlText = htmlText.replace(`{${bIdx}}`, blankHtml);
+            });
+            document.getElementById('gf-paragraph').innerHTML = htmlText;
+        }
+
+        function gfMoveToBlank(bankIdx) {
+            // Find first empty blank
+            const firstEmpty = gfBlanks.findIndex(b => b === "");
+            if (firstEmpty !== -1) {
+                gfBlanks[firstEmpty] = gfBankWords[bankIdx];
+                gfBankWords.splice(bankIdx, 1);
+                renderGapFill();
+            }
+        }
+
+        function gfMoveToBank(blankIdx) {
+            gfBankWords.push(gfBlanks[blankIdx]);
+            gfBlanks[blankIdx] = "";
+            renderGapFill();
+        }
+
+        function checkGapFill() {
+            const feedback = document.getElementById('gf-feedback');
+            feedback.classList.remove('hidden');
+
+            if (gfBlanks.includes("")) {
+                feedback.className = "mt-6 text-center font-bold text-lg text-amber-600 fade-in";
+                feedback.innerHTML = "⚠️ Please fill all the blanks first.";
+                return;
+            }
+
+            let isPerfect = true;
+            gfBlanks.forEach((val, idx) => {
+                if (val !== gfAnswers[idx]) isPerfect = false;
+            });
+
+            if (isPerfect) {
+                feedback.className = "mt-6 text-center font-bold text-lg text-emerald-600 fade-in";
+                feedback.innerHTML = "🎉 Perfect Academic Report!";
+            } else {
+                feedback.className = "mt-6 text-center font-bold text-lg text-rose-600 fade-in";
+                feedback.innerHTML = "✗ Some words are in the wrong place. Click a word in the text to return it to the bank and try again.";
+            }
+        }
+
+        function resetGapFill() {
+            initGapFill();
+        }
+
+        initGapFill();
+
+    </script>
+</body>
+</html>
