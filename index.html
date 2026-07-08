@@ -847,10 +847,24 @@
         /* =========================================================
            GAMES SECTION LOGIC
            ========================================================= */
+        // --- GAME 1: VOCAB CLASH (Teacher reveals full sentence) ---
+        const clashPairs = [
+            { w1: "Plummet", w2: "Surge", sentence: "After shares <span class='clash-highlight'>plummeted</span> in March, demand for tech stocks <span class='clash-highlight'>surged</span> unexpectedly in April." },
+            { w1: "Plateau", w2: "Fluctuate", sentence: "The prices <span class='clash-highlight'>fluctuated</span> for months before they finally <span class='clash-highlight'>plateaued</span> at a reasonable level." },
+            { w1: "Steadily", w2: "Significantly", sentence: "The population grew <span class='clash-highlight'>steadily</span> over the decade and <span class='clash-highlight'>significantly</span> boosted the local economy." },
+            { w1: "Gradual", w2: "Dramatic", sentence: "Although the <span class='clash-highlight'>gradual</span> rise was expected, the <span class='clash-highlight'>dramatic</span> fall in December surprised analysts." },
+            { w1: "Fractional", w2: "Soar", sentence: "Despite a <span class='clash-highlight'>fractional</span> drop in spring, profits began to <span class='clash-highlight'>soar</span> by midsummer." },
+            { w1: "Wildly", w2: "Decline", sentence: "Sales fluctuated <span class='clash-highlight'>wildly</span> before they began to <span class='clash-highlight'>decline</span> steeply toward year-end." },
+            { w1: "Surge", w2: "Decline", sentence: "After a brief <span class='clash-highlight'>surge</span> in February, the figures went into a steady <span class='clash-highlight'>decline</span>." },
+            { w1: "Soar", w2: "Plummet", sentence: "While tourism <span class='clash-highlight'>soared</span> during summer, it <span class='clash-highlight'>plummeted</span> sharply in the off-season." },
+            { w1: "Plateau", w2: "Soar", sentence: "Once the figures <span class='clash-highlight'>plateaued</span> in May, no one expected them to <span class='clash-highlight'>soar</span> again by August." },
+            { w1: "Dramatic", w2: "Fluctuate", sentence: "The <span class='clash-highlight'>dramatic</span> changes caused prices to <span class='clash-highlight'>fluctuate</span> throughout the entire quarter." },
+            { w1: "Significantly", w2: "Plateau", sentence: "Although output increased <span class='clash-highlight'>significantly</span>, it eventually <span class='clash-highlight'>plateaued</span> at 4,000 units." },
+            { w1: "Gradual", w2: "Plummet", sentence: "Following a <span class='clash-highlight'>gradual</span> improvement, sales unexpectedly <span class='clash-highlight'>plummeted</span> in the final quarter." }
+        ];
 
-        // --- GAME 1: VOCAB CLASH ---
-        const clashWords = ["Plummet", "Surge", "Plateau", "Fluctuate", "Steadily", "Significantly", "Gradual", "Dramatic", "Fractional", "Soar", "Wildly", "Decline"];
         let scoreA = 0; let scoreB = 0;
+        let currentClashPair = null;
         
         function changeScore(team, amount) {
             if(team === 'A') { scoreA += amount; document.getElementById('score-a').innerText = scoreA; }
@@ -858,19 +872,40 @@
         }
 
         function drawClashWords() {
-            const shuffled = [...clashWords].sort(() => Math.random() - 0.5);
+            currentClashPair = clashPairs[Math.floor(Math.random() * clashPairs.length)];
+            
             const w1 = document.getElementById('clash-word-1');
             const w2 = document.getElementById('clash-word-2');
             
-            // Animation reset
             w1.style.animation = 'none'; w2.style.animation = 'none';
-            w1.offsetHeight; /* trigger reflow */
+            w1.offsetHeight;
             w1.style.animation = 'fadeIn 0.5s'; w2.style.animation = 'fadeIn 0.5s';
             
-            w1.innerText = shuffled[0];
-            w2.innerText = shuffled[1];
+            w1.innerText = currentClashPair.w1;
+            w2.innerText = currentClashPair.w2;
+
+            // Setup the example sentence area, but keep it fully hidden until teacher toggles
+            document.getElementById('clash-sentence-container').innerHTML = currentClashPair.sentence;
+            document.getElementById('clash-sentence-container').classList.add('hidden');
+            document.getElementById('clash-toggle-btn').innerText = "👁 Reveal Sentence";
+            document.getElementById('clash-example-section').classList.remove('hidden');
         }
 
+        function toggleClashExample() {
+            if (!currentClashPair) return;
+            
+            const container = document.getElementById('clash-sentence-container');
+            const btn = document.getElementById('clash-toggle-btn');
+            
+            if (container.classList.contains('hidden')) {
+                container.classList.remove('hidden');
+                container.classList.add('fade-in');
+                btn.innerText = "🙈 Hide Sentence";
+            } else {
+                container.classList.add('hidden');
+                btn.innerText = "👁 Reveal Sentence";
+            }
+        }
         // --- GAME 2: VOCAB MILLIONAIRE ---
         const milQuestions = [
             { q: "Which word means to go down very quickly?", opts: ["Surge", "Plummet", "Peak", "Climb"], ans: 1 },
