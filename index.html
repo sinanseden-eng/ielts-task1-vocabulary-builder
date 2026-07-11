@@ -93,7 +93,8 @@
         .gap-fill-blank.filled { border-bottom-color: #4f46e5; }
         
         .mil-btn { background: linear-gradient(180deg, #1e3a8a 0%, #172554 100%); border: 2px solid #fbbf24; color: white; transition: all 0.2s; position: relative; }
-        .mil-btn:hover { background: linear-gradient(180deg, #2563eb 0%, #1e3a8a 100%); border-color: #fcd34d; }
+        .mil-btn:hover:not(:disabled) { background: linear-gradient(180deg, #2563eb 0%, #1e3a8a 100%); border-color: #fcd34d; }
+        .mil-btn:disabled { opacity: 0.3; cursor: not-allowed; }
         .mil-btn.correct { background: linear-gradient(180deg, #059669 0%, #047857 100%) !important; border-color: #34d399 !important; animation: pulse-green 1s; }
         .mil-btn.wrong { background: linear-gradient(180deg, #dc2626 0%, #b91c1c 100%) !important; border-color: #f87171 !important; }
         .ladder-step.active { color: #fbbf24; font-weight: 800; background: rgba(251, 191, 36, 0.2); border-radius: 4px; }
@@ -255,7 +256,7 @@
 
         <!-- GAMES SECTION -->
         <div id="games" class="pt-8 pb-12">
-            <h1 class="text-4xl md:text-5xl font-lora font-black text-center text-indigo-900 mb-2 drop-shadow-lg">Interactive Game Zone</h1>
+            <h1 class="text-4xl md:text-5xl font-lora font-black text-center text-indigo-900 mb-2 drop-shadow-lg">Class Games</h1>
             <p class="text-center text-indigo-800 font-bold mb-12 bg-white/40 backdrop-blur-md px-6 py-2 rounded-full w-fit mx-auto border border-white/60">Put your vocabulary to the ultimate test.</p>
 
             <!-- GAME 1: VOCAB CLASH -->
@@ -270,6 +271,15 @@
                     </div>
                     
                     <div class="p-8">
+                        <!-- Adjustable Timer -->
+                        <div class="flex justify-center mb-6">
+                            <div class="inline-flex items-center gap-3 bg-white/80 p-2 rounded-xl border border-slate-200 shadow-sm">
+                                <button onclick="adjustClashTimer(-10)" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold w-9 h-9 rounded-full flex items-center justify-center text-xl">-</button>
+                                <span class="text-xl font-black text-indigo-600 w-100px text-center" id="clash-timer-display">Time: 60s</span>
+                                <button onclick="adjustClashTimer(10)" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold w-9 h-9 rounded-full flex items-center justify-center text-xl">+</button>
+                            </div>
+                        </div>
+
                         <div class="flex flex-col md:flex-row justify-between items-stretch bg-white/60 backdrop-blur-md p-6 rounded-3xl border border-white shadow-inner gap-8">
                             <div class="text-center flex flex-col items-center justify-center bg-white/80 p-6 rounded-2xl border-2 border-rose-200 shadow-sm w-full md:w-48">
                                 <h3 class="text-rose-600 font-black text-2xl tracking-widest uppercase">Team A</h3>
@@ -331,7 +341,7 @@
                             <svg class="w-8 h-8 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                             Game 2: Vocab Millionaire
                         </h2>
-                        <p class="text-slate-400 mt-2">15 Questions. 4 Options. 1 Path to Academic Glory.</p>
+                        <p class="text-slate-400 mt-2">15 Questions. 4 Options. 1 Path to Academic Glory. Difficulty rises as you climb the ladder!</p>
                     </div>
 
                     <div class="p-4 md:p-8 bg-slate-900">
@@ -346,9 +356,17 @@
                                 </div>
 
                                 <div id="mil-game-screen" class="hidden">
+                                    <!-- Lifelines -->
+                                    <div class="flex justify-center gap-4 mb-6">
+                                        <button id="joker-5050" onclick="use5050()" class="bg-slate-700 border-2 border-slate-500 text-sky-400 font-bold py-2 px-6 rounded-full shadow-md hover:bg-slate-600 transition-colors disabled:opacity-30 disabled:cursor-not-allowed text-sm">50:50</button>
+                                        <button id="joker-audience" onclick="askAudience()" class="bg-slate-700 border-2 border-slate-500 text-purple-400 font-bold py-2 px-6 rounded-full shadow-md hover:bg-slate-600 transition-colors disabled:opacity-30 disabled:cursor-not-allowed text-sm">👨‍👩‍👧‍👦 Ask Audience</button>
+                                    </div>
+
+                                    <!-- Question Box -->
                                     <div class="bg-[#0f172a] border-2 border-amber-400/80 p-6 md:p-10 rounded-[50px] text-center text-white font-bold text-xl md:text-2xl mb-8 min-h-[120px] flex items-center justify-center shadow-[0_0_15px_rgba(251,191,36,0.2)]">
                                         <span id="mil-question">Question goes here?</span>
                                     </div>
+                                    <!-- Options -->
                                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="mil-options"></div>
                                 </div>
 
@@ -403,10 +421,19 @@
                         <h2 class="text-3xl font-bold mb-2 flex items-center text-sky-300">
                             Game 4: Trend Memory Match
                         </h2>
-                        <p class="text-slate-300">Flip the cards to match the Academic Verb with its correct Synonym or Definition.</p>
+                        <p class="text-slate-300">Flip the cards to match the Academic Verb with its correct Synonym or Definition. Beat the adjustable timer!</p>
                     </div>
                     
                     <div class="p-8 bg-white/60">
+                        <!-- Adjustable Timer -->
+                        <div class="flex justify-center mb-6">
+                            <div class="inline-flex items-center gap-3 bg-white/80 p-2 rounded-xl border border-slate-200 shadow-sm">
+                                <button onclick="adjustMemTimer(-10)" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold w-9 h-9 rounded-full flex items-center justify-center text-xl">-</button>
+                                <span class="text-xl font-black text-indigo-600 w-100px text-center" id="mem-timer-display">Time: 60s</span>
+                                <button onclick="adjustMemTimer(10)" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold w-9 h-9 rounded-full flex items-center justify-center text-xl">+</button>
+                            </div>
+                        </div>
+
                         <div class="grid grid-cols-3 md:grid-cols-4 gap-4" id="memory-board"></div>
                         
                         <div class="mt-8 flex justify-between items-center bg-white p-4 rounded-xl shadow-sm border border-slate-200">
@@ -624,12 +651,12 @@
         }
 
         /* =========================================================
-           3. VISUAL TREND GUESSER — Expanded
+           3. VISUAL TREND GUESSER — Expanded & Refined
            ========================================================= */
         const guessers = [
             { chart: [10, 9.5, 9, 8.5, 8, 7.5], options: ["A sudden plummet", "A gradual decline", "A slight dip"], correct: "A gradual decline" },
             { chart: [2, 10, 3, 9, 2, 8], options: ["Wild fluctuations", "A steady climb", "A dramatic peak"], correct: "Wild fluctuations" },
-            { chart: [5, 5, 5.1, 5, 5, 5], options: ["A sharp surge", "A steady plateau", "An erratic trajectory"], correct: "A steady plateau" },
+            { chart: [4, 4.5, 9, 8, 4, 2], options: ["A gradual rise followed by a plateau", "A sudden drop followed by a peak", "A steady plateau followed by a decline", "A sharp surge followed by a drop"], correct: "A sharp surge followed by a drop" },
             { chart: [2, 2.5, 3, 5, 8, 9.5], options: ["A gradual levelling off", "An exponential surge", "A slight dip"], correct: "An exponential surge" },
             { chart: [9, 9, 8, 8, 2, 1], options: ["A sudden plummet", "A steady climb", "A marginal fluctuation"], correct: "A sudden plummet" },
             { chart: [3, 4, 5, 6, 7, 8], options: ["A consistent upward trend", "A dramatic fluctuation", "A sharp drop"], correct: "A consistent upward trend" },
@@ -903,7 +930,7 @@
         initCollocationSets();
 
         /* =========================================================
-           6. ODD ONE OUT — 12 questions (10 more added)
+           6. ODD ONE OUT — 12 questions
            ========================================================= */
         const oddOneOutData = [
             { topic: "SPEED OF CHANGE", options: ["Rapid", "Sudden", "Gradual", "Sharp"], wrong: "Gradual", reason: "'Gradual' means slow and steady, while the others mean fast or sudden." },
@@ -960,7 +987,7 @@
            GAMES SECTION LOGIC
            ========================================================= */
 
-        // --- GAME 1: VOCAB CLASH (Teacher reveals full sentence) ---
+        // --- GAME 1: VOCAB CLASH (Teacher reveals full sentence + Timer) ---
         const clashPairs = [
             { w1: "Plummet", w2: "Surge", sentence: "After shares <span class='clash-highlight'>plummeted</span> in March, demand for tech stocks <span class='clash-highlight'>surged</span> unexpectedly in April." },
             { w1: "Plateau", w2: "Fluctuate", sentence: "The prices <span class='clash-highlight'>fluctuated</span> for months before they finally <span class='clash-highlight'>plateaued</span> at a reasonable level." },
@@ -978,7 +1005,31 @@
 
         let scoreA = 0; let scoreB = 0;
         let currentClashPair = null;
-        
+        let clashTimeLimit = 60;
+        let clashTimeLeft = clashTimeLimit;
+        let clashTimerInterval = null;
+
+        function adjustClashTimer(amount) {
+            clearInterval(clashTimerInterval);
+            clashTimeLimit = Math.max(10, clashTimeLimit + amount);
+            clashTimeLeft = clashTimeLimit;
+            document.getElementById('clash-timer-display').innerText = `Time: ${clashTimeLeft}s`;
+        }
+
+        function startClashTimer() {
+            clearInterval(clashTimerInterval);
+            clashTimeLeft = clashTimeLimit;
+            document.getElementById('clash-timer-display').innerText = `Time: ${clashTimeLeft}s`;
+            clashTimerInterval = setInterval(() => {
+                clashTimeLeft--;
+                document.getElementById('clash-timer-display').innerText = `Time: ${clashTimeLeft}s`;
+                if (clashTimeLeft <= 0) {
+                    clearInterval(clashTimerInterval);
+                    document.getElementById('clash-timer-display').innerText = "Time's Up!";
+                }
+            }, 1000);
+        }
+
         function changeScore(team, amount) {
             if(team === 'A') { scoreA += amount; document.getElementById('score-a').innerText = scoreA; }
             if(team === 'B') { scoreB += amount; document.getElementById('score-b').innerText = scoreB; }
@@ -986,6 +1037,7 @@
 
         function drawClashWords() {
             currentClashPair = clashPairs[Math.floor(Math.random() * clashPairs.length)];
+            startClashTimer(); // Start timer on draw
             
             const w1 = document.getElementById('clash-word-1');
             const w2 = document.getElementById('clash-word-2');
@@ -997,7 +1049,6 @@
             w1.innerText = currentClashPair.w1;
             w2.innerText = currentClashPair.w2;
 
-            // Setup the example sentence area, but keep it fully hidden until teacher toggles
             document.getElementById('clash-sentence-container').innerHTML = currentClashPair.sentence;
             document.getElementById('clash-sentence-container').classList.add('hidden');
             document.getElementById('clash-toggle-btn').innerText = "👁 Reveal Sentence";
@@ -1006,10 +1057,8 @@
 
         function toggleClashExample() {
             if (!currentClashPair) return;
-            
             const container = document.getElementById('clash-sentence-container');
             const btn = document.getElementById('clash-toggle-btn');
-            
             if (container.classList.contains('hidden')) {
                 container.classList.remove('hidden');
                 container.classList.add('fade-in');
@@ -1020,27 +1069,33 @@
             }
         }
 
-        // --- GAME 2: VOCAB MILLIONAIRE ---
+        // --- GAME 2: VOCAB MILLIONAIRE (Lifelines & Difficulty Curve) ---
+        // Questions ordered from Easy (1) to Hard (15)
         const milQuestions = [
+            // Easy 1-5
             { q: "Which word means to go down very quickly?", opts: ["Surge", "Plummet", "Peak", "Climb"], ans: 1 },
             { q: "What is the adverb form of 'Dramatic'?", opts: ["Dramatically", "Dramatics", "Dramatize", "Drama"], ans: 0 },
             { q: "Prices reached a ____ of $50.", opts: ["Plateau", "Fluctuation", "Peak", "Bottom"], ans: 2 },
             { q: "Which phrase describes a period of no change?", opts: ["Remained volatile", "Levelled off", "Dipped slightly", "Plunged"], ans: 1 },
             { q: "There was a ____ increase in sales. (Adjective)", opts: ["Significantly", "Steadily", "Gradual", "Rapidly"], ans: 2 },
+            // Medium 6-10
             { q: "What is the opposite of 'Soar'?", opts: ["Rocket", "Plunge", "Surge", "Climb"], ans: 1 },
             { q: "The data ____ wildly throughout the year.", opts: ["Steadied", "Plateaued", "Fluctuated", "Bottomed"], ans: 2 },
             { q: "Which word indicates a very small change?", opts: ["Enormous", "Substantial", "Steep", "Fractional"], ans: 3 },
             { q: "The percentage ____ out at 5%.", opts: ["Peaked", "Bottomed", "Levelled", "Reached"], ans: 1 },
             { q: "Which preposition is correct: Sales increased ____ 10% to 20%.", opts: ["by", "from", "at", "of"], ans: 1 },
-            { q: "Which phrase implies a temporary fall before a recovery?", opts: ["Plummeted", "Crashed", "Dipped slightly", "Rose sharply"], ans: 2 },
+            // Hard 11-15
             { q: "Choose the correct noun phrase:", opts: ["A wildly fluctuate", "A steep climb", "A steadily growth", "A dramatic fell"], ans: 1 },
-            { q: "The proportion stood ____ 25%.", opts: ["at", "on", "in", "by"], ans: 0 },
-            { q: "Which of the following is NOT an adjective?", opts: ["Rapid", "Steep", "Gradually", "Substantial"], ans: 2 },
-            { q: "What is a synonym for 'Plateau'?", opts: ["Hit a low", "Surge", "Remain steady", "Fluctuate"], ans: 2 }
+            { q: "The figures experienced a temporary fall before recovering. Which phrase best describes this?", opts: ["A steep plunge", "A dramatic crash", "A slight dip", "A steady decline"], ans: 2 },
+            { q: "Which preposition completes: 'The proportion stood ____ 25% in 1990'?", opts: ["at", "on", "in", "by"], ans: 0 },
+            { q: "Which word cannot be used to modify a noun directly in academic writing?", opts: ["Rapid", "Steep", "Steadily", "Substantial"], ans: 2 },
+            { q: "Which phrase best replaces 'peaked and then stopped rising'?", opts: ["Hit a low", "Surged forward", "Plateaued", "Fluctuated"], ans: 2 }
         ];
 
         const prizes = ["£100", "£200", "£300", "£500", "£1,000", "£2,000", "£4,000", "£8,000", "£16,000", "£32,000", "£64,000", "£125,000", "£250,000", "£500,000", "£1 MILLION"];
         let milCurrentQ = 0;
+        let joker5050Used = false;
+        let jokerAudienceUsed = false;
 
         function renderLadder() {
             const ladder = document.getElementById('mil-ladder');
@@ -1048,12 +1103,23 @@
                 let cls = "ladder-step px-3 py-1 text-slate-400";
                 if (i === milCurrentQ) cls = "ladder-step active px-3 py-1";
                 if (i < milCurrentQ) cls = "ladder-step safe px-3 py-1";
-                return `<div class="${cls}"><span>${i+1}</span> <span class="float-right">${p}</span></div>`;
+                // Added dash between number and cash
+                return `<div class="${cls}"><span>${i+1} -</span> <span class="float-right">${p}</span></div>`;
             }).join('');
+        }
+
+        function resetJokers() {
+            joker5050Used = false;
+            jokerAudienceUsed = false;
+            const btn1 = document.getElementById('joker-5050');
+            const btn2 = document.getElementById('joker-audience');
+            if(btn1) btn1.disabled = false;
+            if(btn2) btn2.disabled = false;
         }
 
         function startMillionaire() {
             milCurrentQ = 0;
+            resetJokers();
             document.getElementById('mil-start-screen').classList.add('hidden');
             document.getElementById('mil-end-screen').classList.add('hidden');
             document.getElementById('mil-game-screen').classList.remove('hidden');
@@ -1072,6 +1138,61 @@
                         </button>`;
             }).join('');
             renderLadder();
+        }
+
+        function use5050() {
+            if (joker5050Used) return;
+            joker5050Used = true;
+            document.getElementById('joker-5050').disabled = true;
+            
+            const correctIdx = milQuestions[milCurrentQ].ans;
+            const wrongIndices = [0, 1, 2, 3].filter(i => i !== correctIdx);
+            wrongIndices.sort(() => Math.random() - 0.5);
+            const toRemove = wrongIndices.slice(0, 2);
+            
+            toRemove.forEach(idx => {
+                const btn = document.getElementById(`mil-btn-${idx}`);
+                if (btn) {
+                    btn.disabled = true;
+                    btn.style.opacity = "0.2";
+                }
+            });
+        }
+
+        function askAudience() {
+            if (jokerAudienceUsed) return;
+            jokerAudienceUsed = true;
+            document.getElementById('joker-audience').disabled = true;
+
+            const correctIdx = milQuestions[milCurrentQ].ans;
+            const correctPct = Math.floor(Math.random() * 31) + 50; // 50-80%
+            let remainingPct = 100 - correctPct;
+            const pcts = [0, 0, 0, 0];
+            pcts[correctIdx] = correctPct;
+
+            const wrongIndices = [0, 1, 2, 3].filter(i => i !== correctIdx);
+            wrongIndices.forEach((idx, i) => {
+                if (i === wrongIndices.length - 1) {
+                    pcts[idx] = remainingPct;
+                } else {
+                    const randPct = Math.floor(Math.random() * (remainingPct + 1));
+                    pcts[idx] = randPct;
+                    remainingPct -= randPct;
+                }
+            });
+
+            for(let i=0; i<4; i++) {
+                const btn = document.getElementById(`mil-btn-${i}`);
+                if (btn) {
+                    let pctSpan = btn.querySelector('.audience-pct');
+                    if (!pctSpan) {
+                        pctSpan = document.createElement('span');
+                        pctSpan.className = 'audience-pct ml-2 text-amber-300 font-bold';
+                        btn.appendChild(pctSpan);
+                    }
+                    pctSpan.innerText = `(${pcts[i]}%)`;
+                }
+            }
         }
 
         function checkMilAnswer(selectedIdx) {
@@ -1161,9 +1282,34 @@
         function nextSentence() { smCurrentLevel++; initSentenceMaker(); }
         initSentenceMaker();
 
-        // --- GAME 4: MEMORY MATCH ---
+        // --- GAME 4: MEMORY MATCH (Adjustable Timer) ---
         const memoryPairsData = [{ a: "Plummet", b: "Fall sharply", id: 1 }, { a: "Soar", b: "Rise dramatically", id: 2 }, { a: "Plateau", b: "Level off", id: 3 }, { a: "Fluctuate", b: "Oscillate", id: 4 }, { a: "Tiny fraction", b: "Very small part", id: 5 }, { a: "Vast majority", b: "Almost all", id: 6 }];
         let memCards = []; let memFlippedIndices = []; let memMatchedIds = []; let memMoves = 0; let memLockBoard = false;
+        let memTimeLimit = 60;
+        let memTimeLeft = memTimeLimit;
+        let memTimerInterval = null;
+
+        function adjustMemTimer(amount) {
+            clearInterval(memTimerInterval);
+            memTimeLimit = Math.max(10, memTimeLimit + amount);
+            memTimeLeft = memTimeLimit;
+            document.getElementById('mem-timer-display').innerText = `Time: ${memTimeLeft}s`;
+        }
+
+        function startMemTimer() {
+            clearInterval(memTimerInterval);
+            memTimeLeft = memTimeLimit;
+            document.getElementById('mem-timer-display').innerText = `Time: ${memTimeLeft}s`;
+            memTimerInterval = setInterval(() => {
+                memTimeLeft--;
+                document.getElementById('mem-timer-display').innerText = `Time: ${memTimeLeft}s`;
+                if (memTimeLeft <= 0) {
+                    clearInterval(memTimerInterval);
+                    document.getElementById('mem-timer-display').innerText = "Time's Up!";
+                    memLockBoard = true;
+                }
+            }, 1000);
+        }
 
         function initMemoryGame() {
             document.getElementById('memory-moves').innerText = "0";
@@ -1173,6 +1319,7 @@
             memoryPairsData.forEach(pair => { memCards.push({ text: pair.a, id: pair.id }); memCards.push({ text: pair.b, id: pair.id }); });
             memCards.sort(() => Math.random() - 0.5);
             renderMemoryBoard();
+            startMemTimer(); // Start timer on init/restart
         }
 
         function renderMemoryBoard() {
@@ -1200,7 +1347,10 @@
                 memMatchedIds.push(memCards[idx1].id);
                 memFlippedIndices = []; memLockBoard = false;
                 renderMemoryBoard();
-                if (memMatchedIds.length === memoryPairsData.length) document.getElementById('memory-win').classList.remove('hidden');
+                if (memMatchedIds.length === memoryPairsData.length) {
+                    clearInterval(memTimerInterval); // Stop timer on win
+                    document.getElementById('memory-win').classList.remove('hidden');
+                }
             } else {
                 setTimeout(() => { memFlippedIndices = []; memLockBoard = false; renderMemoryBoard(); }, 1000);
             }
