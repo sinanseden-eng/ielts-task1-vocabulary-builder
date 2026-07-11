@@ -226,7 +226,7 @@
                             <svg class="w-8 h-8 mr-3 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5M12 21l-2-1m2 1l2-1m-2 1v-2.5M6 18l-2-1v-2.5M18 18l2-1v-2.5"></path></svg>
                             Collocation Matchers
                         </h2>
-                        <p class="text-slate-700 font-medium">Click a word/phrase on the left, then click its natural partner on the right.</p>
+                        <p class="text-slate-700 font-medium">Click a word/phrase on the left, then click its natural partner on the right. Wrong matches will be rejected!</p>
                     </div>
                 </div>
 
@@ -765,14 +765,44 @@
         }
 
         /* =========================================================
-           5. COLLOCATION MATCHER — 5 sets (3 more added)
+           5. COLLOCATION MATCHER — 5 sets (Strict 1:1 matching)
            ========================================================= */
         const collocationSets = [
-            { name: "Degree & Speed", pairs: [{ left: "A dramatic", right: "surge in prices." }, { left: "A gradual", right: "decline over ten years." }, { left: "Wild", right: "fluctuations throughout the period." }, { left: "A steady", right: "growth in the population." }, { left: "A sharp", right: "drop in overall sales." }] },
-            { name: "Extremes", pairs: [{ left: "Reached a", right: "peak of 50%." }, { left: "Bottomed", right: "out at 10 units." }, { left: "Levelled", right: "off after a brief rise." }, { left: "Remained", right: "relatively stable." }, { left: "Hit an", right: "all-time low." }] },
-            { name: "Verbs & Prepositions", pairs: [{ left: "Increased", right: "by 20%." }, { left: "Rose", right: "to 50 units." }, { left: "Fell", right: "from 80 to 40." }, { left: "Peaked", right: "at 1,000." }, { left: "Stood", right: "at 5%." }] },
-            { name: "Noun Phrases", pairs: [{ left: "A steady", right: "rise over the decade." }, { left: "A dramatic", right: "fall in 2008." }, { left: "A gradual", right: "decline throughout." }, { left: "A sharp", right: "drop in March." }, { left: "A slight", right: "increase by year-end." }] },
-            { name: "Time References", pairs: [{ left: "Over", right: "the period shown." }, { left: "Throughout", right: "the entire decade." }, { left: "At the beginning", right: "of the period." }, { left: "During", right: "the first quarter." }, { left: "By the end", right: "of 2010." }] }
+            { name: "Degree & Speed", pairs: [
+                { left: "A dramatic", right: "surge of 50%." },
+                { left: "A gradual", right: "rise over 10 years." },
+                { left: "Wild", right: "fluctuations day by day." },
+                { left: "A steady", right: "growth of 2% annually." },
+                { left: "A sharp", right: "drop overnight." }
+            ]},
+            { name: "Extremes", pairs: [
+                { left: "Reached a", right: "peak of 50%." },
+                { left: "Bottomed", right: "out at 10 units." },
+                { left: "Levelled", right: "off after a brief rise." },
+                { left: "Remained", right: "relatively stable." },
+                { left: "Hit an", right: "all-time low." }
+            ]},
+            { name: "Verbs & Prepositions", pairs: [
+                { left: "Increased", right: "by 20%." },
+                { left: "Rose", right: "to 50 units." },
+                { left: "Fell", right: "from 80 to 40." },
+                { left: "Peaked", right: "at 1,000." },
+                { left: "Stood", right: "at 5%." }
+            ]},
+            { name: "Noun & Context", pairs: [
+                { left: "A surge", right: "in demand." },
+                { left: "A decline", right: "in quality." },
+                { left: "An increase", right: "of 20%." },
+                { left: "A peak", right: "at midnight." },
+                { left: "A drop", right: "from 50 to 10." }
+            ]},
+            { name: "Time Prepositions", pairs: [
+                { left: "Between", right: "2000 and 2010." },
+                { left: "Since", right: "the year 2000." },
+                { left: "In", right: "the month of June." },
+                { left: "From", right: "Monday to Friday." },
+                { left: "At", right: "exactly 3 PM." }
+            ]}
         ];
 
         let currentCollocSetIndex = 0;
@@ -781,6 +811,7 @@
         let activeRightId = null;
         let shuffledLeft = [];
         let shuffledRight = [];
+        let collocLockBoard = false;
 
         function initCollocationSets() {
             document.getElementById('colloc-set-nav').innerHTML = collocationSets.map((set, idx) => `<button onclick="loadCollocSet(${idx})" id="colloc-btn-${idx}" class="px-5 py-2.5 rounded-full font-bold shadow-sm transition-colors text-sm ${idx === 0 ? 'bg-purple-600 text-white' : 'bg-white/80 text-slate-700 hover:bg-white'}">Set ${idx + 1}: ${set.name}</button>`).join('');
@@ -792,6 +823,7 @@
             matchedIds = [];
             activeLeftId = null;
             activeRightId = null;
+            collocLockBoard = false;
             document.getElementById('colloc-feedback').classList.add('hidden');
             
             collocationSets.forEach((_, idx) => {
@@ -824,27 +856,49 @@
                 cls += isMatched ? "bg-emerald-100 border-emerald-400 text-emerald-800 opacity-60 cursor-default" : isSelected ? "bg-indigo-100 border-indigo-500 text-indigo-900" : "bg-white/90 border-white text-slate-700 hover:bg-white cursor-pointer";
                 rightEl.innerHTML += `<button onclick="handleCollocClick('right', ${item.id})" class="${cls}" ${isMatched ? 'disabled' : ''}>${item.right}</button>`;
             });
-
-            if (matchedIds.length === 5) {
-                const fb = document.getElementById('colloc-feedback');
-                fb.classList.remove('hidden');
-                fb.className = "mt-6 text-center font-black text-xl text-emerald-600 bg-emerald-50 py-3 rounded-xl border border-emerald-200 fade-in";
-                fb.innerHTML = "🎉 All Collocations Matched!";
-            }
         }
 
         function handleCollocClick(side, id) {
-            if (matchedIds.includes(id)) return;
+            if (collocLockBoard || matchedIds.includes(id)) return;
+            
             if (side === 'left') activeLeftId = (activeLeftId === id) ? null : id;
             if (side === 'right') activeRightId = (activeRightId === id) ? null : id;
+            
             renderCollocations();
-            if (activeLeftId !== null && activeRightId !== null) setTimeout(checkCollocMatch, 300);
+            
+            if (activeLeftId !== null && activeRightId !== null) {
+                checkCollocMatch();
+            }
         }
 
         function checkCollocMatch() {
-            if (activeLeftId === activeRightId) { matchedIds.push(activeLeftId); }
-            activeLeftId = null; activeRightId = null;
-            renderCollocations();
+            const leftId = activeLeftId;
+            const rightId = activeRightId;
+            
+            if (leftId === rightId) {
+                matchedIds.push(leftId);
+                activeLeftId = null; activeRightId = null;
+                renderCollocations();
+                if (matchedIds.length === collocationSets[currentCollocSetIndex].pairs.length) {
+                    const fb = document.getElementById('colloc-feedback');
+                    fb.classList.remove('hidden');
+                    fb.className = "mt-6 text-center font-black text-xl text-emerald-600 bg-emerald-50 py-3 rounded-xl border border-emerald-200 fade-in";
+                    fb.innerHTML = "🎉 All Collocations Matched!";
+                }
+            } else {
+                collocLockBoard = true;
+                const leftBtn = document.querySelector(`button[onclick="handleCollocClick('left', ${leftId})"]`);
+                const rightBtn = document.querySelector(`button[onclick="handleCollocClick('right', ${rightId})"]`);
+                
+                if (leftBtn) leftBtn.classList.add('btn-wrong');
+                if (rightBtn) rightBtn.classList.add('btn-wrong');
+                
+                setTimeout(() => {
+                    activeLeftId = null; activeRightId = null;
+                    collocLockBoard = false;
+                    renderCollocations();
+                }, 600);
+            }
         }
         initCollocationSets();
 
